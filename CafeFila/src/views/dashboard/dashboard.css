@@ -1,146 +1,190 @@
 .dashboard-container {
-  max-width: 1200px;
+  max-width: 900px;
   margin: auto;
+  padding: 20px;
+  font-family: 'Inter', Arial, sans-serif;
+  color: #333;
 }
 
+/* HEADER */
 .header-controls {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 10px;
+  margin-bottom: 10px;
 }
 
-/* ----------------------- */
-/* FILTROS DE CAFÉ */
-/* ----------------------- */
+.header-controls h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #4b2e19;
+}
+
+/* Subtítulo */
+.dashboard-container > p {
+  margin-top: -5px;
+  font-size: 16px;
+  color: #666;
+}
+
+/* ==== FILTRO COM IMAGENS E BOTÕES ==== */
+
 .filtro-botoes {
   display: flex;
-  gap: 20px;
-  justify-content: center;
-  margin-bottom: 30px;
+  align-items: center;
+  gap: 16px;
+  margin: 25px 0;
+  padding: 15px;
+  border-radius: 16px;
+  background: #faf6f1;
+  box-shadow: 0px 2px 4px rgba(0,0,0,0.08);
+}
+
+.filtro-botoes v-img {
+  border-radius: 12px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
 }
 
 .filtro-botoes button {
-  background: #f5f5f5;
-  padding: 12px 24px;
-  border-radius: 25px;
-  font-weight: bold;
-  border: 2px solid transparent;
+  background: #eae7e4;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: 0.25s;
+  font-weight: 600;
+  transition: 0.2s;
+  font-size: 15px;
+}
+
+.filtro-botoes button:hover {
+  background: #d8d4d0;
 }
 
 .filtro-botoes .ativo {
-  background: #3b82f6;
+  background: #4b2e19;
   color: white;
-  border-color: #1e40af;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
 }
 
-/* ----------------------- */
-/* CARDS DE ESTATÍSTICA */
-/* ----------------------- */
+/* ==== CARDS DE STATUS ==== */
+
 .stats-wrapper {
-  display: flex;
-  justify-content: center;
-  gap: 25px;
-  margin-bottom: 30px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin: 30px 0;
 }
 
 .stat-card {
-  width: 160px;
-  height: 140px;
-  border-radius: 20px;
+  padding: 14px;
   background: white;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+  border-radius: 14px;
+  text-align: center;
+  font-weight: 600;
+  color: #4b2e19;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  transition: 0.25s;
+  gap: 8px;
+  font-size: 14px;
 }
 
-.stat-card:hover {
-  transform: scale(1.04);
-}
+/* ==== TÍTULO FILA ==== */
 
-/* ----------------------- */
-/* TÍTULO DA FILA */
-/* ----------------------- */
 .titulo-fila {
-  font-size: 1.4rem;
-  font-weight: bold;
-  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 20px 0 12px;
+  color: #4b2e19;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
-/* ----------------------- */
-/* BOX DA FILA */
-/* ----------------------- */
+/* ==== LISTA DA FILA ==== */
+
 .fila-box {
-  width: 100%;
-  background: white;
-  border-radius: 15px;
-  padding: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-  margin-bottom: 40px;
+  background: #ffffff;
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
 }
 
-/* ----------------------- */
-/* ITEM DE PEDIDO */
-/* ----------------------- */
+/* ==== PEDIDO ITEM ==== */
+
 .pedido-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #ececec;
-  padding: 18px 0;
+  justify-content: space-between;
+  padding: 16px 12px;
+  border-bottom: 1px solid #eee;
 }
 
-.pedido-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.pedido-item:last-child {
+  border-bottom: none;
 }
+
+.pedido-info strong {
+  font-size: 15px;
+  color: #333;
+}
+
+.pedido-info small {
+  font-size: 13px;
+  color: #777;
+}
+
+/* STATUS */
 
 .pedido-status {
   display: flex;
-  gap: 10px;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 13px;
+  gap: 4px;
 }
 
-/* Tag amarelinha */
 .tag-status {
-  background: #fff3c4;
-  padding: 5px 10px;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: bold;
+  background: #ffe9c8;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #a86f00;
 }
 
-/* ----------------------- */
-/* BOTÕES */
-/* ----------------------- */
+/* BOTÕES DE AÇÃO */
+
 .btn-actions {
   display: flex;
-  gap: 15px;
+  gap: 8px;
 }
 
-.btn-ok, .btn-x {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+.btn-ok,
+.btn-x {
   border: none;
-  font-size: 1.4rem;
-  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   cursor: pointer;
+  font-size: 18px;
+  transition: 0.2s;
 }
 
 .btn-ok {
-  background: #16a34a;
+  background: #42c36a;
+  color: white;
+}
+
+.btn-ok:hover {
+  background: #36a85a;
 }
 
 .btn-x {
-  background: #dc2626;
+  background: #ff6b6b;
+  color: white;
+}
+
+.btn-x:hover {
+  background: #e85656;
 }

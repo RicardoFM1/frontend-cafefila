@@ -9,15 +9,32 @@
 
     <p>Controle de pedidos em tempo real</p>
 
-    <!-- BOTÕES DE TIPO DE CAFÉ -->
+    
     <div class="filtro-botoes">
+        <v-img
+        :src="'/public/image.png'"
+        cover
+        aspect-ratio="16/9"
+        height="100px"
+        width="100px"
+        >
+
+        </v-img>
       <button 
         :class="{ ativo: tipoSelecionado === 'expresso' }"
         @click="tipoSelecionado = 'expresso'"
       >
         ☕ Café Expresso
       </button>
+<v-img
+        :src="'/public/image-copy.png'"
+        cover
+        aspect-ratio="16/9"
+        height="100px"
+        width="100px"
+        >
 
+        </v-img>
       <button 
         :class="{ ativo: tipoSelecionado === 'filtro' }"
         @click="tipoSelecionado = 'filtro'"
@@ -27,7 +44,7 @@
     </div>
 
     <!-- CARDS DE STATUS -->
-    <div class="stats-wrapper">
+    <!-- <div class="stats-wrapper">
       <div class="stat-card">
         <v-icon size="32">mdi-account-group</v-icon>
         Na fila
@@ -47,7 +64,7 @@
         <v-icon size="32">mdi-trending-up</v-icon>
         Hoje
       </div>
-    </div>
+    </div> -->
 
     <!-- FILA SELECIONADA -->
     <div class="titulo-fila">
