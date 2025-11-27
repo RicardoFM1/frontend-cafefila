@@ -224,7 +224,7 @@
                   class="font-weight-black elevation-3"
                 >
                   <v-icon left>mdi-coffee-check</v-icon>
-                  COMPRA CONCLUÍDA
+                  CONFIRMAR COMPRA
                 </v-btn>
               </v-card-actions>
               <v-card-subtitle
@@ -558,7 +558,7 @@ const concluirCompra = async () => {
   alertType.value = "info";
   try {
     const res = await connection.post(`/fila/concluir/${compradorId}`);
-    alertMessage.value = res?.data?.message || "Compra concluída.";
+    alertMessage.value = res?.data?.message || "Confirmar compra.";
     alertType.value = "success";
     await fetchFila();
   } catch (err) {
