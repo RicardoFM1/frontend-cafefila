@@ -422,6 +422,115 @@ const coffeeInfoSources = ref([]);
 const visible = ref(false);
 const carregando = ref(false);
 
+const historicoLoading = ref(false);
+const historico = reactive([]);
+const filtro = reactive({
+  usuarioId: null,
+  item: null, // 'cafe' ou 'filtro'
+  dataInicio: null,
+  dataFim: null,
+});
+
+// Opções de filtros (NOVAS)
+const itemOptions = ["Café", "Filtro"];
+const historicoHeaders = [
+  { title: "Comprador", key: "usuario" },
+  { title: "Itens", key: "item", sortable: false },
+  { title: "Data da Compra", key: "dataCompra" },
+];
+
+// Computed Property para extrair lista de usuários ÚNICOS para o filtro (NOVA)
+const historicoUsuarios = computed(() => {
+  const users = new Map();
+  historico.forEach(item => {
+    if (item.usuario && !users.has(item.usuario.id)) {
+      users.set(item.usuario.id, {
+        id: item.usuario.id,
+        usuario: item.usuario.email.split('@')[0]
+      });
+    }
+  });
+  return Array.from(users.values());
+});
+
+// Computed Property para aplicar filtros (NOVA)
+const historicoFiltrado = computed(() => {
+  let items = [...historico];
+
+  // 1. Filtrar por Usuário
+  if (filtro.usuarioId) {
+    items = items.filter(item => item.usuario_id === filtro.usuarioId);
+  }
+
+  // 2. Filtrar por Item
+  if (filtro.item) {
+    const itemKey = filtro.item === 'Café' ? 'cafe' : 'filtro';
+    items = items.filter(item => item[itemKey] > 0);
+  }
+
+  // 3. Filtrar por Período de Data
+  const dataInicio = filtro.dataInicio ? new Date(filtro.dataInicio) : null;
+  const dataFim = filtro.dataFim ? new Date(filtro.dataFim) : null;
+
+  if (dataInicio || dataFim) {
+    items = items.filter(item => {
+      const itemDate = new Date(item.created_at);
+      
+      // Ajustar dataFim para incluir o dia inteiro (até 23:59:59)
+      if (dataFim) {
+        dataFim.setHours(23, 59, 59, 999);
+      }
+      
+      const isAfterStart = !dataInicio || itemDate >= dataInicio;
+      const isBeforeEnd = !dataFim || itemDate <= dataFim;
+      
+      return isAfterStart && isBeforeEnd;
+    });
+  }
+
+  return items;
+});
+
+// ... (Restante das computed properties - isCurrentUserAdmin, proximoComprador, etc.)
+
+// ... (funções utilitárias - abrir, cancelar, formatarDataLocal)
+
+// Nova função de busca do Histórico (NOVA)
+const fetchHistorico = async () => {
+  if (!isCurrentUserAdmin.value) return; // Apenas admins podem ver o histórico
+  historicoLoading.value = true;
+  try {
+    // ASSUME que você tem um endpoint '/historico' que retorna as compras concluídas
+    const res = await connection.get("/historico"); 
+    historico.splice(0, historico.length, ...res.data);
+  } catch (err) {
+    console.error("fetchHistorico error", err);
+    alertMessage.value = "Erro ao carregar o histórico de compras.";
+    alertType.value = "error";
+  } finally {
+    historicoLoading.value = false;
+  }
+};
+
+// Função para aplicar o filtro (NOVA)
+const aplicarFiltroHistorico = () => {
+    // Como a filtragem é feita na computed property 'historicoFiltrado',
+    // se o histórico já estiver carregado, a UI atualiza automaticamente.
+    // Se o backend for mais complexo e exigir nova chamada de API,
+    // você chamaria fetchHistorico aqui, passando os filtros como query params.
+    if (historico.length === 0 && !historicoLoading.value) {
+        fetchHistorico();
+    }
+    alertMessage.value = "Filtros aplicados ao histórico.";
+    alertType.value = "info";
+    setTimeout(() => { alertMessage.value = null; }, 3000);
+};
+
+// ... (Restante das funções de Ação - fetchFila, adicionarItem, removerDaFila, etc.)
+
+// Função loadCurrentUser modificada para carregar histórico (ALTERADA)
+
+
 const isCurrentUserAdmin = computed(() => !!currentUser.value && !!currentUser.value.admin);
 
 const proximoComprador = computed(() => {
@@ -446,16 +555,39 @@ function cancelar() {
   visible.value = false;
 }
 
+
+ 
+const formatarDataLocal = (isoString) => {
+  
+  const data = new Date(isoString);
+
+
+  const dia = String(data.getDate()).padStart(2, '0');
+  const mes = String(data.getMonth() + 1).padStart(2, '0'); 
+  const ano = data.getFullYear();
+  const hora = String(data.getHours()).padStart(2, '0');
+  const minuto = String(data.getMinutes()).padStart(2, '0');
+
+ 
+  return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
+};
+
+
 const formatarPedidos = (item) => {
   if (!item) return "✅ Sem itens de compra definidos";
   const needs = [];
   if (item.cafe > 0) needs.push(`☕ Café x${item.cafe}`);
   if (item.filtro > 0) needs.push(`🔽 Filtro x${item.filtro}`);
+  
+
+  if (item.created_at) {
+    needs.push(`Entrou na fila em: ${formatarDataLocal(item.created_at)}`);
+  }
+  
   if (needs.length === 0) return "✅ Sem itens de compra definidos";
   return needs.join(" | ");
 };
 
-// API actions
 const fetchFila = async () => {
   loading.value = true;
   try {
