@@ -156,7 +156,7 @@
                       block
                       color="brown-darken-1"
                       @click="adicionarItem('cafe')"
-                      :disabled="loading || !currentUser"
+                      :disabled="loadingAdicionar || !currentUser"
                       prepend-icon="mdi-coffee-maker"
                       size="large"
                       variant="flat"
@@ -169,7 +169,7 @@
                       block
                       color="light-blue-darken-3"
                       @click="adicionarItem('filtro')"
-                      :disabled="loading || !currentUser"
+                      :disabled="loadingAdicionar || !currentUser"
                       prepend-icon="mdi-filter-cog"
                       size="large"
                       variant="flat"
@@ -353,7 +353,7 @@
           ></v-btn>
         </v-card-title>
         <v-card-text class="pt-4">
-          <v-progress-linear v-if="apiLoading" indeterminate color="amber"></v-progress-linear>
+         
           <div v-html="coffeeInfoText" class="text-body-1 text-medium-emphasis"></div>
 
           <div v-if="coffeeInfoSources.length > 0 && !apiLoading" class="mt-4 pt-3 border-t">
@@ -491,16 +491,12 @@ const historicoFiltrado = computed(() => {
   return items;
 });
 
-// ... (Restante das computed properties - isCurrentUserAdmin, proximoComprador, etc.)
 
-// ... (funções utilitárias - abrir, cancelar, formatarDataLocal)
-
-// Nova função de busca do Histórico (NOVA)
 const fetchHistorico = async () => {
-  if (!isCurrentUserAdmin.value) return; // Apenas admins podem ver o histórico
+  if (!isCurrentUserAdmin.value) return; 
   historicoLoading.value = true;
   try {
-    // ASSUME que você tem um endpoint '/historico' que retorna as compras concluídas
+    
     const res = await connection.get("/historico"); 
     historico.splice(0, historico.length, ...res.data);
   } catch (err) {
@@ -512,12 +508,9 @@ const fetchHistorico = async () => {
   }
 };
 
-// Função para aplicar o filtro (NOVA)
+
 const aplicarFiltroHistorico = () => {
-    // Como a filtragem é feita na computed property 'historicoFiltrado',
-    // se o histórico já estiver carregado, a UI atualiza automaticamente.
-    // Se o backend for mais complexo e exigir nova chamada de API,
-    // você chamaria fetchHistorico aqui, passando os filtros como query params.
+    
     if (historico.length === 0 && !historicoLoading.value) {
         fetchHistorico();
     }
@@ -526,9 +519,6 @@ const aplicarFiltroHistorico = () => {
     setTimeout(() => { alertMessage.value = null; }, 3000);
 };
 
-// ... (Restante das funções de Ação - fetchFila, adicionarItem, removerDaFila, etc.)
-
-// Função loadCurrentUser modificada para carregar histórico (ALTERADA)
 
 
 const isCurrentUserAdmin = computed(() => !!currentUser.value && !!currentUser.value.admin);
@@ -605,9 +595,11 @@ const fetchFila = async () => {
   }
 };
 
+const loadingAdicionar = ref(false)
+
 const adicionarItem = async (tipo) => {
   if (!currentUser.value || loading.value) return;
-  loading.value = true;
+  loadingAdicionar.value = true;
   alertType.value = "info";
   try {
     if (tipo === "filtro") {
@@ -632,7 +624,7 @@ const adicionarItem = async (tipo) => {
     alertMessage.value = `Falha ao adicionar ${tipo}: ${msg}`;
     alertType.value = "error";
   } finally {
-    loading.value = false;
+    loadingAdicionar.value = false;
   }
 };
 
