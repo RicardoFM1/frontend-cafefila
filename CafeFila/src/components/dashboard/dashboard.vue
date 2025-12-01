@@ -7,21 +7,18 @@
       contained
       z-index="9999"
     >
-           
       <div class="text-center">
-               
         <v-progress-circular
           indeterminate
           color="amber-lighten-3"
           size="72"
           width="8"
         ></v-progress-circular>
-               
+
         <p class="mt-4 text-h6 font-weight-bold text-white">A Carregar Dados da Fila...</p>
-             
       </div>
-         
     </v-overlay>
+
     <v-app-bar app color="brown-darken-4" elevation="4">
       <v-container class="py-0 fill-height d-flex justify-space-between align-center">
         <v-toolbar-title
@@ -179,8 +176,6 @@
                   </v-col>
                 </v-row>
               </v-card-text>
-
-              <v-divider class="my-4"></v-divider>
             </v-card>
           </v-col>
 
@@ -237,8 +232,6 @@
           </v-col>
         </v-row>
 
-        
-
         <v-row v-if="!loading && filaCompradores.length === 0">
           <v-col cols="12">
             <v-card class="pa-6 text-center elevation-3" color="green-lighten-5" rounded="xl">
@@ -253,19 +246,48 @@
           </v-col>
         </v-row>
 
-        <v-row v-else-if="restanteDaFila.length > 0">
+        <v-row v-else-if="filaCompradoresFiltrada.length > 0">
           <v-col cols="12">
             <v-card elevation="4" class="pa-4" rounded="xl">
               <v-card-title
                 class="text-h6 text-orange-darken-3 font-weight-bold d-flex align-center"
               >
                 <v-icon left class="mr-2">mdi-account-group</v-icon>
-                Próximos Compradores (Total: {{ restanteDaFila.length }})
+                Próximos Compradores (Total: {{ restanteDaFilaFiltrada.length }})
               </v-card-title>
+
+              <v-card-text class="pt-0 pb-2">
+                <v-row align="center">
+                  <v-col cols="12" md="6" class="pt-0 pb-1">
+                    <v-select
+                      v-model="filtroFila.item"
+                      :items="itemOptions"
+                      label="Filtrar por Item Necessário"
+                      clearable
+                      prepend-icon="mdi-magnify"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="12" md="6" class="d-flex align-center justify-end pt-0 pb-1">
+                    <v-btn
+                      color="grey-darken-1"
+                      variant="text"
+                      prepend-icon="mdi-close-circle-outline"
+                      @click="limparFiltrosFila"
+                      :disabled="!filtroFila.item"
+                    >
+                      Limpar Filtro da Fila
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+              <v-divider class="mx-4"></v-divider>
 
               <v-list density="default" class="bg-transparent">
                 <v-list-item
-                  v-for="(p, index) in restanteDaFila"
+                  v-for="(p, index) in restanteDaFilaFiltrada"
                   :key="p.usuario_id"
                   class="my-3 pa-3 rounded-lg list-item-hover"
                   :class="{
@@ -353,7 +375,6 @@
           ></v-btn>
         </v-card-title>
         <v-card-text class="pt-4">
-         
           <div v-html="coffeeInfoText" class="text-body-1 text-medium-emphasis"></div>
 
           <div v-if="coffeeInfoSources.length > 0 && !apiLoading" class="mt-4 pt-3 border-t">
@@ -384,22 +405,23 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="visible" max-width="400">
+      <v-card>
+        <v-card-title class="text-h6">Deseja realmente sair?</v-card-title>
+
+        <v-card-text> Você será desconectado do sistema. </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn text @click="cancelar" :disabled="carregando">Cancelar</v-btn>
+
+          <v-btn color="red" @click="handleLogout" :loading="carregando"> Sair </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
-  <v-dialog v-model="visible" max-width="400">
-    <v-card>
-      <v-card-title class="text-h6">Deseja realmente sair?</v-card-title>
-
-      <v-card-text> Você será desconectado do sistema. </v-card-text>
-
-      <v-card-actions>
-        <v-spacer></v-spacer>
-
-        <v-btn text @click="cancelar" :disabled="carregando">Cancelar</v-btn>
-
-        <v-btn color="red" @click="handleLogout" :loading="carregando"> Sair </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
 </template>
 
 <script setup>
@@ -411,6 +433,7 @@ const router = useRouter();
 
 const filaCompradores = reactive([]);
 const loading = ref(false);
+const loadingAdicionar = ref(false);
 const alertMessage = ref(null);
 const alertType = ref("info");
 const currentUser = ref(null);
@@ -424,66 +447,101 @@ const carregando = ref(false);
 
 const historicoLoading = ref(false);
 const historico = reactive([]);
+
+// FILTROS DA FILA (NOVOS)
+const filtroFila = reactive({
+  item: null, // 'Café', 'Filtro', ou null
+});
+
+const itemOptions = ["Café", "Filtro"];
+
+// PROPRIEDADE COMPUTADA DA FILA (NOVA)
+const filaCompradoresFiltrada = computed(() => {
+  let items = [...filaCompradores];
+
+  if (filtroFila.item) {
+    const itemKey = filtroFila.item === "Café" ? "cafe" : "filtro";
+    items = items.filter((item) => item[itemKey] > 0);
+  }
+
+  return items;
+});
+
+const limparFiltrosFila = () => {
+  filtroFila.item = null;
+  alertMessage.value = "Filtros da fila limpos.";
+  alertType.value = "info";
+  setTimeout(() => {
+    alertMessage.value = null;
+  }, 3000);
+};
+
+// --- Histórico Properties e Methods ---
+
 const filtro = reactive({
   usuarioId: null,
-  item: null, // 'cafe' ou 'filtro'
+  item: null,
   dataInicio: null,
   dataFim: null,
 });
 
-// Opções de filtros (NOVAS)
-const itemOptions = ["Café", "Filtro"];
 const historicoHeaders = [
   { title: "Comprador", key: "usuario" },
-  { title: "Itens", key: "item", sortable: false },
+  { title: "Itens", key: "item" },
   { title: "Data da Compra", key: "dataCompra" },
 ];
 
-// Computed Property para extrair lista de usuários ÚNICOS para o filtro (NOVA)
+const limparFiltros = () => {
+  filtro.usuarioId = null;
+  filtro.item = null;
+  filtro.dataInicio = null;
+  filtro.dataFim = null;
+  alertMessage.value = "Filtros de histórico limpos.";
+  alertType.value = "info";
+  setTimeout(() => {
+    alertMessage.value = null;
+  }, 3000);
+};
+
 const historicoUsuarios = computed(() => {
   const users = new Map();
-  historico.forEach(item => {
+  historico.forEach((item) => {
     if (item.usuario && !users.has(item.usuario.id)) {
       users.set(item.usuario.id, {
         id: item.usuario.id,
-        usuario: item.usuario.email.split('@')[0]
+        usuario: item.usuario.email.split("@")[0],
       });
     }
   });
   return Array.from(users.values());
 });
 
-// Computed Property para aplicar filtros (NOVA)
 const historicoFiltrado = computed(() => {
   let items = [...historico];
 
-  // 1. Filtrar por Usuário
   if (filtro.usuarioId) {
-    items = items.filter(item => item.usuario_id === filtro.usuarioId);
+    items = items.filter((item) => item.usuario_id === filtro.usuarioId);
   }
 
-  // 2. Filtrar por Item
   if (filtro.item) {
-    const itemKey = filtro.item === 'Café' ? 'cafe' : 'filtro';
-    items = items.filter(item => item[itemKey] > 0);
+    const itemKey = filtro.item === "Café" ? "cafe" : "filtro";
+    items = items.filter((item) => item[itemKey] > 0);
   }
 
-  // 3. Filtrar por Período de Data
   const dataInicio = filtro.dataInicio ? new Date(filtro.dataInicio) : null;
   const dataFim = filtro.dataFim ? new Date(filtro.dataFim) : null;
 
   if (dataInicio || dataFim) {
-    items = items.filter(item => {
+    items = items.filter((item) => {
       const itemDate = new Date(item.created_at);
-      
-      // Ajustar dataFim para incluir o dia inteiro (até 23:59:59)
+
       if (dataFim) {
         dataFim.setHours(23, 59, 59, 999);
       }
-      
+
       const isAfterStart = !dataInicio || itemDate >= dataInicio;
       const isBeforeEnd = !dataFim || itemDate <= dataFim;
-      
+
       return isAfterStart && isBeforeEnd;
     });
   }
@@ -491,13 +549,10 @@ const historicoFiltrado = computed(() => {
   return items;
 });
 
-
 const fetchHistorico = async () => {
-  if (!isCurrentUserAdmin.value) return; 
   historicoLoading.value = true;
   try {
-    
-    const res = await connection.get("/historico"); 
+    const res = await connection.get("/historico");
     historico.splice(0, historico.length, ...res.data);
   } catch (err) {
     console.error("fetchHistorico error", err);
@@ -508,27 +563,33 @@ const fetchHistorico = async () => {
   }
 };
 
-
 const aplicarFiltroHistorico = () => {
-    
-    if (historico.length === 0 && !historicoLoading.value) {
-        fetchHistorico();
-    }
-    alertMessage.value = "Filtros aplicados ao histórico.";
-    alertType.value = "info";
-    setTimeout(() => { alertMessage.value = null; }, 3000);
+  if (historico.length === 0 && !historicoLoading.value) {
+    fetchHistorico();
+  }
+  alertMessage.value = "Filtros aplicados ao histórico. Resultados visíveis na tabela.";
+  alertType.value = "info";
+  setTimeout(() => {
+    alertMessage.value = null;
+  }, 3000);
 };
 
-
+// --- Fila e User Computed Properties ---
 
 const isCurrentUserAdmin = computed(() => !!currentUser.value && !!currentUser.value.admin);
 
+// O próximo comprador é sempre o primeiro na fila real (não filtrada)
 const proximoComprador = computed(() => {
   return filaCompradores.length > 0 ? filaCompradores[0] : null;
 });
 
-const restanteDaFila = computed(() => filaCompradores.slice(1));
+// A fila filtrada, excluindo o primeiro elemento
+const restanteDaFilaFiltrada = computed(() => {
+  // Pega a fila filtrada e remove o primeiro (que é o proximoComprador)
+  return filaCompradoresFiltrada.value.slice(1);
+});
 
+// O item do usuário atual deve ser verificado na fila real (não filtrada) para ter a posição correta
 const currentUserQueueItem = computed(() => {
   if (!currentUser.value) return null;
   const index = filaCompradores.findIndex((item) => item.usuario_id === currentUser.value.id);
@@ -545,35 +606,26 @@ function cancelar() {
   visible.value = false;
 }
 
-
- 
 const formatarDataLocal = (isoString) => {
-  
   const data = new Date(isoString);
-
-
-  const dia = String(data.getDate()).padStart(2, '0');
-  const mes = String(data.getMonth() + 1).padStart(2, '0'); 
+  const dia = String(data.getDate()).padStart(2, "0");
+  const mes = String(data.getMonth() + 1).padStart(2, "0");
   const ano = data.getFullYear();
-  const hora = String(data.getHours()).padStart(2, '0');
-  const minuto = String(data.getMinutes()).padStart(2, '0');
-
- 
+  const hora = String(data.getHours()).padStart(2, "0");
+  const minuto = String(data.getMinutes()).padStart(2, "0");
   return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
 };
-
 
 const formatarPedidos = (item) => {
   if (!item) return "✅ Sem itens de compra definidos";
   const needs = [];
   if (item.cafe > 0) needs.push(`☕ Café x${item.cafe}`);
   if (item.filtro > 0) needs.push(`🔽 Filtro x${item.filtro}`);
-  
 
   if (item.created_at) {
     needs.push(`Entrou na fila em: ${formatarDataLocal(item.created_at)}`);
   }
-  
+
   if (needs.length === 0) return "✅ Sem itens de compra definidos";
   return needs.join(" | ");
 };
@@ -582,7 +634,6 @@ const fetchFila = async () => {
   loading.value = true;
   try {
     const res = await connection.get("/fila");
-    // espera um array de objetos com relação 'usuario'
     filaCompradores.splice(0, filaCompradores.length, ...res.data);
     if (alertType.value !== "error") alertMessage.value = null;
   } catch (err) {
@@ -594,8 +645,6 @@ const fetchFila = async () => {
     loading.value = false;
   }
 };
-
-const loadingAdicionar = ref(false)
 
 const adicionarItem = async (tipo) => {
   if (!currentUser.value || loading.value) return;
@@ -682,9 +731,10 @@ const concluirCompra = async () => {
   alertType.value = "info";
   try {
     const res = await connection.post(`/fila/concluir/${compradorId}`);
-    alertMessage.value = res?.data?.message || "Confirmar compra.";
+    alertMessage.value = res?.data?.message || "Compra concluída e histórico atualizado.";
     alertType.value = "success";
     await fetchFila();
+    await fetchHistorico();
   } catch (err) {
     console.error("concluirCompra error", err);
     const msg = err?.response?.data?.message || err.message || "Erro ao concluir compra";
@@ -696,6 +746,7 @@ const concluirCompra = async () => {
 };
 
 const fetchGroundedCoffeeInfo = async () => {
+  showInfoDialog.value = true;
   apiLoading.value = true;
   coffeeInfoText.value = "A pesquisar preços e locais de compra na web. Aguarde...";
   coffeeInfoSources.value = [];
@@ -716,22 +767,21 @@ const loadCurrentUser = async () => {
     alertMessage.value = "Sessão não encontrada. Faça login.";
     alertType.value = "warning";
     currentUser.value = null;
+    loading.value = false;
     return;
   }
 
   try {
     const res = await connection.get("/usuarios/me");
     currentUser.value = res.data;
-
     await fetchFila();
   } catch (err) {
     console.error("loadCurrentUser error", err);
     const msg = err?.response?.data?.message || err.message || "Erro ao obter usuário";
     alertMessage.value = `Erro ao carregar usuário: ${msg}`;
     alertType.value = "error";
-
     currentUser.value = null;
-  }finally{
+  } finally {
     loading.value = false;
   }
 };
@@ -745,19 +795,13 @@ const handleLogout = () => {
   setTimeout(() => {
     localStorage.removeItem("jwt_token");
     localStorage.removeItem("usuario");
+    router.push("/login");
   }, 2000);
-
-  router.push("/login");
-};
-
-const handleDetails = () => {
-  alertMessage.value =
-    "Ação de Histórico: Esta funcionalidade mostraria as compras concluídas recentemente.";
-  alertType.value = "info";
 };
 
 onMounted(async () => {
   await loadCurrentUser();
+  await fetchHistorico();
 });
 </script>
 
