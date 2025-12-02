@@ -1,5 +1,6 @@
 <template>
   <v-app class="app-background">
+    <!-- OVERLAY DE LOADING -->
     <v-overlay
       :model-value="loading"
       class="align-center justify-center"
@@ -8,25 +9,20 @@
       z-index="9999"
     >
       <div class="text-center">
-        <v-progress-circular
-          indeterminate
-          color="amber-lighten-3"
-          size="72"
-          width="8"
-        ></v-progress-circular>
-
+        <v-progress-circular indeterminate color="amber-lighten-3" size="72" width="8" />
         <p class="mt-4 text-h6 font-weight-bold text-white">A Carregar Dados da Fila...</p>
       </div>
     </v-overlay>
 
+    <!-- APP BAR -->
     <v-app-bar app color="brown-darken-4" elevation="4">
       <v-container class="py-0 fill-height d-flex justify-space-between align-center">
         <v-toolbar-title
           class="text-amber-lighten-3 font-weight-black text-h5 text-center flex-grow-1"
         >
-          <v-icon class="mr-2">mdi-coffee-to-go</v-icon> DASHBOARD DE FILA DE CAFÉ
+          <v-icon class="mr-2">mdi-coffee-to-go</v-icon>
+          DASHBOARD DE FILA DE CAFÉ
         </v-toolbar-title>
-
         <v-btn
           variant="text"
           color="white"
@@ -35,15 +31,20 @@
           @click="abrir"
         >
           Sair
-          <span v-if="currentUser" class="ml-1 d-none d-sm-inline font-weight-light text-capitalize"
-            >({{ currentUser.email.split("@")[0] }})</span
+          <span
+            v-if="currentUser"
+            class="ml-1 d-none d-sm-inline font-weight-light text-capitalize"
           >
+            ({{ currentUser.email.split("@")[0] }})
+          </span>
         </v-btn>
       </v-container>
     </v-app-bar>
 
+    <!-- CONTEÚDO PRINCIPAL -->
     <v-main>
       <v-container fluid class="pa-4 main-content-padding">
+        <!-- Título e Alert -->
         <v-row>
           <v-col cols="12">
             <h1 class="text-h4 font-weight-black mb-2 text-brown-darken-4">
@@ -67,6 +68,7 @@
           </v-col>
         </v-row>
 
+        <!-- CARD DO USUÁRIO -->
         <v-row class="mb-6">
           <v-col cols="12" md="6">
             <v-card class="pa-6 elevation-6" color="white" rounded="xl">
@@ -76,9 +78,9 @@
                 <v-icon left size="28" class="mr-2">mdi-account-check</v-icon>
                 O seu Estado na Fila
               </v-card-title>
-
               <v-divider class="mt-1 mb-4"></v-divider>
 
+              <!-- Usuário na fila -->
               <template v-if="currentUserQueueItem">
                 <v-sheet
                   :color="currentUserQueueItem.isNext ? 'green-lighten-5' : 'blue-grey-lighten-5'"
@@ -94,11 +96,13 @@
                       size="large"
                       class="font-weight-black text-uppercase"
                     >
-                      <v-icon start>{{
-                        currentUserQueueItem.isNext
-                          ? "mdi-trophy-gold"
-                          : "mdi-numeric-" + currentUserQueueItem.position + "-circle"
-                      }}</v-icon>
+                      <v-icon start>
+                        {{
+                          currentUserQueueItem.isNext
+                            ? "mdi-trophy-gold"
+                            : "mdi-numeric-" + currentUserQueueItem.position + "-circle"
+                        }}
+                      </v-icon>
                       {{
                         currentUserQueueItem.isNext
                           ? "É O PRÓXIMO!"
@@ -129,6 +133,7 @@
                 </v-btn>
               </template>
 
+              <!-- Usuário não está na fila -->
               <template v-else>
                 <v-alert
                   type="info"
@@ -141,8 +146,8 @@
                 </v-alert>
               </template>
 
+              <!-- Adicionar Pedido -->
               <v-divider class="my-4"></v-divider>
-
               <v-card-text class="py-0">
                 <div class="text-subtitle-1 font-weight-bold mb-3 text-brown-darken-3">
                   Adicionar/Atualizar Pedido:
@@ -179,6 +184,7 @@
             </v-card>
           </v-col>
 
+          <!-- Próximo comprador -->
           <v-col cols="12" md="6" v-if="proximoComprador">
             <v-card
               color="brown-lighten-5"
@@ -197,7 +203,6 @@
                 >
                   {{ proximoComprador.usuario.email.split("@")[0] }}
                 </div>
-
                 <v-sheet class="pa-3 rounded-lg bg-brown-lighten-4">
                   <div class="text-subtitle-1 font-weight-bold text-brown-darken-3 mb-1">
                     🛒 Itens Necessários:
@@ -218,10 +223,10 @@
                   @click="concluirCompra"
                   class="font-weight-black elevation-3"
                 >
-                  <v-icon left>mdi-coffee-check</v-icon>
-                  CONFIRMAR COMPRA
+                  <v-icon left>mdi-coffee-check</v-icon> CONFIRMAR COMPRA
                 </v-btn>
               </v-card-actions>
+
               <v-card-subtitle
                 v-if="!isCurrentUserAdmin"
                 class="text-red-darken-2 text-center mt-3 font-weight-medium"
@@ -232,6 +237,7 @@
           </v-col>
         </v-row>
 
+        <!-- Fila vazia -->
         <v-row v-if="!loading && filaCompradores.length === 0">
           <v-col cols="12">
             <v-card class="pa-6 text-center elevation-3" color="green-lighten-5" rounded="xl">
@@ -246,6 +252,7 @@
           </v-col>
         </v-row>
 
+        <!-- Lista filtrada da fila -->
         <v-row v-else-if="filaCompradoresFiltrada.length > 0">
           <v-col cols="12">
             <v-card elevation="4" class="pa-4" rounded="xl">
@@ -268,7 +275,7 @@
                       variant="outlined"
                       density="compact"
                       hide-details
-                    ></v-select>
+                    />
                   </v-col>
                   <v-col cols="12" md="6" class="d-flex align-center justify-end pt-0 pb-1">
                     <v-btn
@@ -283,6 +290,7 @@
                   </v-col>
                 </v-row>
               </v-card-text>
+
               <v-divider class="mx-4"></v-divider>
 
               <v-list density="default" class="bg-transparent">
@@ -304,7 +312,6 @@
                       {{ index + 2 }}
                     </v-avatar>
                   </template>
-
                   <v-list-item-title class="font-weight-bold text-brown-darken-3 text-capitalize">
                     {{ p.usuario.email.split("@")[0] }}
                     <v-chip
@@ -312,10 +319,10 @@
                       color="blue"
                       size="small"
                       class="ml-2 font-weight-medium"
-                      >VOCÊ</v-chip
                     >
+                      VOCÊ
+                    </v-chip>
                   </v-list-item-title>
-
                   <v-list-item-subtitle class="mt-1 text-body-2 font-weight-medium">
                     Itens:
                     <span class="text-brown-darken-1 font-weight-bold">{{
@@ -334,7 +341,7 @@
                       :disabled="!isCurrentUserAdmin || loading"
                       @click="moverParaProximo(p.usuario_id)"
                       class="mr-2"
-                    ></v-btn>
+                    />
                     <v-btn
                       icon="mdi-trash-can-outline"
                       size="small"
@@ -344,7 +351,7 @@
                       :loading="loading"
                       :disabled="!isCurrentUserAdmin || loading"
                       @click="removerDaFila(p)"
-                    ></v-btn>
+                    />
                   </template>
                 </v-list-item>
               </v-list>
@@ -361,46 +368,20 @@
       </v-container>
     </v-main>
 
+    <!-- DIALOGS -->
     <v-dialog v-model="showInfoDialog" max-width="600">
       <v-card rounded="xl">
         <v-card-title
           class="text-h5 font-weight-bold bg-brown-darken-4 text-white d-flex justify-space-between"
         >
           Informações Atuais de Compra (Pesquisa Web)
-          <v-btn
-            icon="mdi-close"
-            variant="text"
-            color="white"
-            @click="showInfoDialog = false"
-          ></v-btn>
+          <v-btn icon="mdi-close" variant="text" color="white" @click="showInfoDialog = false" />
         </v-card-title>
         <v-card-text class="pt-4">
-          <div v-html="coffeeInfoText" class="text-body-1 text-medium-emphasis"></div>
-
-          <div v-if="coffeeInfoSources.length > 0 && !apiLoading" class="mt-4 pt-3 border-t">
-            <div class="font-weight-bold text-subtitle-2 text-brown-darken-2 mb-2">
-              Fontes de Pesquisa:
-            </div>
-            <v-list density="compact" class="pa-0">
-              <v-list-item
-                v-for="(source, index) in coffeeInfoSources"
-                :key="index"
-                :href="source.uri"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="pa-0 mb-1"
-                style="min-height: 20px"
-              >
-                <v-list-item-title
-                  class="text-caption text-blue-darken-2 text-decoration-underline"
-                  >{{ source.title }}</v-list-item-title
-                >
-              </v-list-item>
-            </v-list>
-          </div>
+          <div v-html="coffeeInfoText" class="text-body-1 text-medium-emphasis" />
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-btn color="red-darken-1" variant="text" @click="showInfoDialog = false">Fechar</v-btn>
         </v-card-actions>
       </v-card>
@@ -409,15 +390,11 @@
     <v-dialog v-model="visible" max-width="400">
       <v-card>
         <v-card-title class="text-h6">Deseja realmente sair?</v-card-title>
-
-        <v-card-text> Você será desconectado do sistema. </v-card-text>
-
+        <v-card-text>Você será desconectado do sistema.</v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
-
+          <v-spacer />
           <v-btn text @click="cancelar" :disabled="carregando">Cancelar</v-btn>
-
-          <v-btn color="red" @click="handleLogout" :loading="carregando"> Sair </v-btn>
+          <v-btn color="red" @click="handleLogout" :loading="carregando">Sair</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -430,40 +407,30 @@ import { connection } from "@/connection/axiosConnection";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-
 const filaCompradores = reactive([]);
 const loading = ref(false);
 const loadingAdicionar = ref(false);
 const alertMessage = ref(null);
 const alertType = ref("info");
 const currentUser = ref(null);
-
 const showInfoDialog = ref(false);
 const apiLoading = ref(false);
 const coffeeInfoText = ref("A procurar informações...");
 const coffeeInfoSources = ref([]);
 const visible = ref(false);
 const carregando = ref(false);
-
 const historicoLoading = ref(false);
 const historico = reactive([]);
 
-// FILTROS DA FILA (NOVOS)
-const filtroFila = reactive({
-  item: null, // 'Café', 'Filtro', ou null
-});
-
+const filtroFila = reactive({ item: null });
 const itemOptions = ["Café", "Filtro"];
 
-// PROPRIEDADE COMPUTADA DA FILA (NOVA)
 const filaCompradoresFiltrada = computed(() => {
   let items = [...filaCompradores];
-
   if (filtroFila.item) {
     const itemKey = filtroFila.item === "Café" ? "cafe" : "filtro";
     items = items.filter((item) => item[itemKey] > 0);
   }
-
   return items;
 });
 
@@ -476,144 +443,31 @@ const limparFiltrosFila = () => {
   }, 3000);
 };
 
-// --- Histórico Properties e Methods ---
-
-const filtro = reactive({
-  usuarioId: null,
-  item: null,
-  dataInicio: null,
-  dataFim: null,
-});
-
-const historicoHeaders = [
-  { title: "Comprador", key: "usuario" },
-  { title: "Itens", key: "item" },
-  { title: "Data da Compra", key: "dataCompra" },
-];
-
-const limparFiltros = () => {
-  filtro.usuarioId = null;
-  filtro.item = null;
-  filtro.dataInicio = null;
-  filtro.dataFim = null;
-  alertMessage.value = "Filtros de histórico limpos.";
-  alertType.value = "info";
-  setTimeout(() => {
-    alertMessage.value = null;
-  }, 3000);
-};
-
-const historicoUsuarios = computed(() => {
-  const users = new Map();
-  historico.forEach((item) => {
-    if (item.usuario && !users.has(item.usuario.id)) {
-      users.set(item.usuario.id, {
-        id: item.usuario.id,
-        usuario: item.usuario.email.split("@")[0],
-      });
-    }
-  });
-  return Array.from(users.values());
-});
-
-const historicoFiltrado = computed(() => {
-  let items = [...historico];
-
-  if (filtro.usuarioId) {
-    items = items.filter((item) => item.usuario_id === filtro.usuarioId);
-  }
-
-  if (filtro.item) {
-    const itemKey = filtro.item === "Café" ? "cafe" : "filtro";
-    items = items.filter((item) => item[itemKey] > 0);
-  }
-
-  const dataInicio = filtro.dataInicio ? new Date(filtro.dataInicio) : null;
-  const dataFim = filtro.dataFim ? new Date(filtro.dataFim) : null;
-
-  if (dataInicio || dataFim) {
-    items = items.filter((item) => {
-      const itemDate = new Date(item.created_at);
-
-      if (dataFim) {
-        dataFim.setHours(23, 59, 59, 999);
-      }
-
-      const isAfterStart = !dataInicio || itemDate >= dataInicio;
-      const isBeforeEnd = !dataFim || itemDate <= dataFim;
-
-      return isAfterStart && isBeforeEnd;
-    });
-  }
-
-  return items;
-});
-
-const fetchHistorico = async () => {
-  historicoLoading.value = true;
-  try {
-    const res = await connection.get("/historico");
-    historico.splice(0, historico.length, ...res.data);
-  } catch (err) {
-    console.error("fetchHistorico error", err);
-    alertMessage.value = "Erro ao carregar o histórico de compras.";
-    alertType.value = "error";
-  } finally {
-    historicoLoading.value = false;
-  }
-};
-
-const aplicarFiltroHistorico = () => {
-  if (historico.length === 0 && !historicoLoading.value) {
-    fetchHistorico();
-  }
-  alertMessage.value = "Filtros aplicados ao histórico. Resultados visíveis na tabela.";
-  alertType.value = "info";
-  setTimeout(() => {
-    alertMessage.value = null;
-  }, 3000);
-};
-
-// --- Fila e User Computed Properties ---
-
-const isCurrentUserAdmin = computed(() => !!currentUser.value && !!currentUser.value.admin);
-
-// O próximo comprador é sempre o primeiro na fila real (não filtrada)
-const proximoComprador = computed(() => {
-  return filaCompradores.length > 0 ? filaCompradores[0] : null;
-});
-
-// A fila filtrada, excluindo o primeiro elemento
-const restanteDaFilaFiltrada = computed(() => {
-  // Pega a fila filtrada e remove o primeiro (que é o proximoComprador)
-  return filaCompradoresFiltrada.value.slice(1);
-});
-
-// O item do usuário atual deve ser verificado na fila real (não filtrada) para ter a posição correta
+const isCurrentUserAdmin = computed(() => !!currentUser.value?.admin);
+const proximoComprador = computed(() => filaCompradores[0] || null);
+const restanteDaFilaFiltrada = computed(() => filaCompradoresFiltrada.value.slice(1));
 const currentUserQueueItem = computed(() => {
   if (!currentUser.value) return null;
-  const index = filaCompradores.findIndex((item) => item.usuario_id === currentUser.value.id);
+  const index = filaCompradores.findIndex((i) => i.usuario_id === currentUser.value.id);
   if (index === -1) return null;
-  const item = filaCompradores[index];
-  return { ...item, position: index + 1, isNext: index === 0 };
+  return { ...filaCompradores[index], position: index + 1, isNext: index === 0 };
 });
 
 function abrir() {
   visible.value = true;
 }
-
 function cancelar() {
   visible.value = false;
 }
 
-const formatarDataLocal = (isoString) => {
-  const data = new Date(isoString);
-  const dia = String(data.getDate()).padStart(2, "0");
-  const mes = String(data.getMonth() + 1).padStart(2, "0");
-  const ano = data.getFullYear();
-  const hora = String(data.getHours()).padStart(2, "0");
-  const minuto = String(data.getMinutes()).padStart(2, "0");
-  return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
+const formatarDataLocal = (iso) => {
+  const data = new Date(iso);
+  return `${String(data.getDate()).padStart(2, "0")}/${String(data.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}/${data.getFullYear()} ${String(data.getHours()).padStart(2, "0")}:${String(
+    data.getMinutes()
+  ).padStart(2, "0")}`;
 };
 
 const formatarPedidos = (item) => {
@@ -621,13 +475,8 @@ const formatarPedidos = (item) => {
   const needs = [];
   if (item.cafe > 0) needs.push(`☕ Café x${item.cafe}`);
   if (item.filtro > 0) needs.push(`🔽 Filtro x${item.filtro}`);
-
-  if (item.created_at) {
-    needs.push(`Entrou na fila em: ${formatarDataLocal(item.created_at)}`);
-  }
-
-  if (needs.length === 0) return "✅ Sem itens de compra definidos";
-  return needs.join(" | ");
+  if (item.created_at) needs.push(`Entrou na fila em: ${formatarDataLocal(item.created_at)}`);
+  return needs.length ? needs.join(" | ") : "✅ Sem itens de compra definidos";
 };
 
 const fetchFila = async () => {
@@ -635,11 +484,9 @@ const fetchFila = async () => {
   try {
     const res = await connection.get("/fila");
     filaCompradores.splice(0, filaCompradores.length, ...res.data);
-    if (alertType.value !== "error") alertMessage.value = null;
-  } catch (err) {
-    console.error("fetchFila error", err);
-    const msg = err?.response?.data?.message || err.message || "Erro ao carregar a fila";
-    alertMessage.value = `Erro ao carregar a fila: ${msg}`;
+  } catch (e) {
+    console.error(e);
+    alertMessage.value = "Erro ao carregar a fila";
     alertType.value = "error";
   } finally {
     loading.value = false;
@@ -651,26 +498,22 @@ const adicionarItem = async (tipo) => {
   loadingAdicionar.value = true;
   alertType.value = "info";
   try {
-    if (tipo === "filtro") {
-      const temCafe = currentUserQueueItem.value && currentUserQueueItem.value.cafe > 0;
-      if (!temCafe) {
-        alertMessage.value = "❌ Não pode adicionar filtro à fila antes de adicionar um café.";
-        alertType.value = "warning";
-        setTimeout(() => {
-          alertMessage.value = null;
-        }, 5000);
-        return;
-      }
+    if (
+      tipo === "filtro" &&
+      (!currentUserQueueItem.value || currentUserQueueItem.value.cafe <= 0)
+    ) {
+      alertMessage.value = "❌ Não pode adicionar filtro antes de adicionar café.";
+      alertType.value = "warning";
+      setTimeout(() => (alertMessage.value = null), 5000);
+      return;
     }
     const res = await connection.patch(`/fila/adicionar_pedido/${tipo}`);
-    const message = res?.data?.message || `Item ${tipo} adicionado`;
-    alertMessage.value = message;
+    alertMessage.value = res?.data?.message || `Item ${tipo} adicionado`;
     alertType.value = "success";
     await fetchFila();
-  } catch (err) {
-    console.error("adicionarItem error", err);
-    const msg = err?.response?.data?.message || err.message || "Erro ao adicionar item";
-    alertMessage.value = `Falha ao adicionar ${tipo}: ${msg}`;
+  } catch (e) {
+    console.error(e);
+    alertMessage.value = `Falha ao adicionar ${tipo}`;
     alertType.value = "error";
   } finally {
     loadingAdicionar.value = false;
@@ -684,21 +527,19 @@ const removerDaFila = async (filaItem) => {
     alertType.value = "warning";
     return;
   }
-
   loading.value = true;
   alertType.value = "info";
   try {
     await connection.delete(`/fila/sair/${filaItem.usuario_id}`);
-    const isSelf = filaItem.usuario_id === currentUser.value?.id;
-    alertMessage.value = isSelf
-      ? `Saiu da fila.`
-      : `Utilizador ${filaItem.usuario.email.split("@")[0]} removido da fila.`;
+    alertMessage.value =
+      filaItem.usuario_id === currentUser.value?.id
+        ? `Saiu da fila.`
+        : `${filaItem.usuario.email.split("@")[0]} removido da fila.`;
     alertType.value = "success";
     await fetchFila();
-  } catch (err) {
-    console.error("removerDaFila error", err);
-    const msg = err?.response?.data?.message || err.message || "Erro ao remover da fila";
-    alertMessage.value = `Falha ao remover da fila: ${msg}`;
+  } catch (e) {
+    console.error(e);
+    alertMessage.value = "Falha ao remover da fila";
     alertType.value = "error";
   } finally {
     loading.value = false;
@@ -714,10 +555,9 @@ const moverParaProximo = async (id) => {
     alertMessage.value = res?.data?.message || "Utilizador movido para a 2ª posição.";
     alertType.value = "success";
     await fetchFila();
-  } catch (err) {
-    console.error("moverParaProximo error", err);
-    const msg = err?.response?.data?.message || err.message || "Erro ao mover utilizador";
-    alertMessage.value = `Falha ao mover utilizador: ${msg}`;
+  } catch (e) {
+    console.error(e);
+    alertMessage.value = "Falha ao mover utilizador";
     alertType.value = "error";
   } finally {
     loading.value = false;
@@ -726,37 +566,18 @@ const moverParaProximo = async (id) => {
 
 const concluirCompra = async () => {
   if (!proximoComprador.value || loading.value || !isCurrentUserAdmin.value) return;
-  const compradorId = proximoComprador.value.usuario_id;
   loading.value = true;
-  alertType.value = "info";
   try {
-    const res = await connection.post(`/fila/concluir/${compradorId}`);
-    alertMessage.value = res?.data?.message || "Compra concluída e histórico atualizado.";
+    const res = await connection.post(`/fila/concluir/${proximoComprador.value.usuario_id}`);
+    alertMessage.value = res?.data?.message || "Compra concluída";
     alertType.value = "success";
     await fetchFila();
-    await fetchHistorico();
-  } catch (err) {
-    console.error("concluirCompra error", err);
-    const msg = err?.response?.data?.message || err.message || "Erro ao concluir compra";
-    alertMessage.value = `Falha ao concluir compra: ${msg}`;
+  } catch (e) {
+    console.error(e);
+    alertMessage.value = "Falha ao concluir compra";
     alertType.value = "error";
   } finally {
     loading.value = false;
-  }
-};
-
-const fetchGroundedCoffeeInfo = async () => {
-  showInfoDialog.value = true;
-  apiLoading.value = true;
-  coffeeInfoText.value = "A pesquisar preços e locais de compra na web. Aguarde...";
-  coffeeInfoSources.value = [];
-
-  try {
-    coffeeInfoText.value = "Funcionalidade de busca por preço (requer API key).";
-  } catch (e) {
-    coffeeInfoText.value = "Erro na pesquisa.";
-  } finally {
-    apiLoading.value = false;
   }
 };
 
@@ -764,21 +585,18 @@ const loadCurrentUser = async () => {
   loading.value = true;
   const token = localStorage.getItem("jwt_token");
   if (!token) {
-    alertMessage.value = "Sessão não encontrada. Faça login.";
+    alertMessage.value = "Sessão não encontrada";
     alertType.value = "warning";
-    currentUser.value = null;
     loading.value = false;
     return;
   }
-
   try {
     const res = await connection.get("/usuarios/me");
     currentUser.value = res.data;
     await fetchFila();
-  } catch (err) {
-    console.error("loadCurrentUser error", err);
-    const msg = err?.response?.data?.message || err.message || "Erro ao obter usuário";
-    alertMessage.value = `Erro ao carregar usuário: ${msg}`;
+  } catch (e) {
+    console.error(e);
+    alertMessage.value = "Erro ao carregar usuário";
     alertType.value = "error";
     currentUser.value = null;
   } finally {
@@ -794,14 +612,12 @@ const handleLogout = () => {
   alertType.value = "success";
   setTimeout(() => {
     localStorage.removeItem("jwt_token");
-    localStorage.removeItem("usuario");
     router.push("/login");
   }, 2000);
 };
 
 onMounted(async () => {
   await loadCurrentUser();
-  await fetchHistorico();
 });
 </script>
 
@@ -809,31 +625,25 @@ onMounted(async () => {
 .app-background {
   background-color: #f7f3f0 !important;
 }
-
 .main-content-padding {
   max-width: 1400px;
 }
-
 .v-main {
   padding-top: 64px !important;
 }
-
 .list-item-hover:hover {
   background-color: #edeaea;
   cursor: pointer;
 }
-
 .card-next-queue {
   border: 3px solid #6d4c41 !important;
   background: linear-gradient(145deg, #efebe9, #fbf8f5);
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
-
 .card-next-queue:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15) !important;
 }
-
 .v-list-item {
   transition: all 0.2s;
 }
