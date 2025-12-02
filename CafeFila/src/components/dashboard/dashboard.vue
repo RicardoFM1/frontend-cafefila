@@ -10,7 +10,9 @@
     >
       <div class="text-center">
         <v-progress-circular indeterminate color="amber-lighten-3" size="72" width="8" />
-        <p class="mt-4 text-h6 font-weight-bold text-white">A Carregar Dados da Fila...</p>
+        <p class="mt-4 text-h6 font-weight-bold text-white">
+          A Carregar Dados da Fila...
+        </p>
       </div>
     </v-overlay>
 
@@ -31,10 +33,7 @@
           @click="abrir"
         >
           Sair
-          <span
-            v-if="currentUser"
-            class="ml-1 d-none d-sm-inline font-weight-light text-capitalize"
-          >
+          <span v-if="currentUser" class="ml-1 d-none d-sm-inline font-weight-light text-capitalize">
             ({{ currentUser.email.split("@")[0] }})
           </span>
         </v-btn>
@@ -114,9 +113,7 @@
 
                 <div class="text-body-1 font-weight-medium mb-4 text-brown-darken-1">
                   <span class="font-weight-black">Pedidos:</span>
-                  <span class="text-medium-emphasis">{{
-                    formatarPedidos(currentUserQueueItem)
-                  }}</span>
+                  <span class="text-medium-emphasis">{{ formatarPedidos(currentUserQueueItem) }}</span>
                 </div>
 
                 <v-btn
@@ -264,31 +261,54 @@
               </v-card-title>
 
               <v-card-text class="pt-0 pb-2">
-                <v-row align="center">
-                  <v-col cols="12" md="6" class="pt-0 pb-1">
+                <v-row align="center" class="mb-3">
+                  <v-col cols="12" md="4">
                     <v-select
                       v-model="filtroFila.item"
                       :items="itemOptions"
-                      label="Filtrar por Item Necessário"
+                      label="Filtrar por Item"
                       clearable
-                      prepend-icon="mdi-magnify"
+                      prepend-icon="mdi-coffee"
                       variant="outlined"
                       density="compact"
-                      hide-details
                     />
                   </v-col>
-                  <v-col cols="12" md="6" class="d-flex align-center justify-end pt-0 pb-1">
-                    <v-btn
-                      color="grey-darken-1"
-                      variant="text"
-                      prepend-icon="mdi-close-circle-outline"
-                      @click="limparFiltrosFila"
-                      :disabled="!filtroFila.item"
-                    >
-                      Limpar Filtro da Fila
-                    </v-btn>
+
+                  <v-col cols="12" md="4">
+                    <v-text-field
+                      v-model="filtroFila.usuario"
+                      label="Filtrar por Usuário"
+                      clearable
+                      prepend-icon="mdi-account-search"
+                      variant="outlined"
+                      density="compact"
+                    />
+                  </v-col>
+
+                  <v-col cols="12" md="4" class="d-flex gap-2">
+                    <v-menu v-model="periodoMenu" :close-on-content-click="false" transition="scale-transition" offset-y>
+                      <template #activator="{ props }">
+                        <v-text-field
+                          v-model="periodoText"
+                          label="Filtrar por Período"
+                          prepend-icon="mdi-calendar-range"
+                          readonly
+                          v-bind="props"
+                          clearable
+                        />
+                      </template>
+                      <v-date-picker
+                        v-model="filtroFila.periodo"
+                        type="range"
+                        @update:model-value="updatePeriodoText"
+                      />
+                    </v-menu>
                   </v-col>
                 </v-row>
+
+                <v-btn color="grey-darken-1" @click="limparFiltrosFila" variant="text">
+                  Limpar Filtros
+                </v-btn>
               </v-card-text>
 
               <v-divider class="mx-4"></v-divider>
@@ -325,9 +345,7 @@
                   </v-list-item-title>
                   <v-list-item-subtitle class="mt-1 text-body-2 font-weight-medium">
                     Itens:
-                    <span class="text-brown-darken-1 font-weight-bold">{{
-                      formatarPedidos(p)
-                    }}</span>
+                    <span class="text-brown-darken-1 font-weight-bold">{{ formatarPedidos(p) }}</span>
                   </v-list-item-subtitle>
 
                   <template v-slot:append>
@@ -368,7 +386,7 @@
       </v-container>
     </v-main>
 
-    <!-- DIALOGS -->
+    <!-- DIALOG DE INFORMAÇÃO -->
     <v-dialog v-model="showInfoDialog" max-width="600">
       <v-card rounded="xl">
         <v-card-title
@@ -387,6 +405,7 @@
       </v-card>
     </v-dialog>
 
+    <!-- DIALOG DE LOGOUT -->
     <v-dialog v-model="visible" max-width="400">
       <v-card>
         <v-card-title class="text-h6">Deseja realmente sair?</v-card-title>
@@ -401,11 +420,15 @@
   </v-app>
 </template>
 
+
 <script setup>
 import { ref, reactive, computed, onMounted } from "vue";
-import { connection } from "@/connection/axiosConnection";
 import { useRouter } from "vue-router";
+import { connection } from "@/connection/axiosConnection";
 
+// ------------------------------
+// REFS E REACTIVES
+// ------------------------------
 const router = useRouter();
 const filaCompradores = reactive([]);
 const loading = ref(false);
@@ -414,63 +437,63 @@ const alertMessage = ref(null);
 const alertType = ref("info");
 const currentUser = ref(null);
 const showInfoDialog = ref(false);
-const apiLoading = ref(false);
 const coffeeInfoText = ref("A procurar informações...");
-const coffeeInfoSources = ref([]);
 const visible = ref(false);
 const carregando = ref(false);
-const historicoLoading = ref(false);
-const historico = reactive([]);
 
-const filtroFila = reactive({ item: null });
+const filtroFila = reactive({
+  item: null,
+  usuario: "",
+  periodo: null,
+});
 const itemOptions = ["Café", "Filtro"];
 
-const filaCompradoresFiltrada = computed(() => {
-  let items = [...filaCompradores];
-  if (filtroFila.item) {
-    const itemKey = filtroFila.item === "Café" ? "cafe" : "filtro";
-    items = items.filter((item) => item[itemKey] > 0);
-  }
-  return items;
-});
+const periodoMenu = ref(false);
+const periodoText = ref("");
 
-const limparFiltrosFila = () => {
-  filtroFila.item = null;
-  alertMessage.value = "Filtros da fila limpos.";
-  alertType.value = "info";
-  setTimeout(() => {
-    alertMessage.value = null;
-  }, 3000);
-};
-
+// ------------------------------
+// COMPUTED
+// ------------------------------
 const isCurrentUserAdmin = computed(() => !!currentUser.value?.admin);
 const proximoComprador = computed(() => filaCompradores[0] || null);
 const restanteDaFilaFiltrada = computed(() => filaCompradoresFiltrada.value.slice(1));
 const currentUserQueueItem = computed(() => {
   if (!currentUser.value) return null;
-  const index = filaCompradores.findIndex((i) => i.usuario_id === currentUser.value.id);
+  const index = filaCompradores.findIndex(i => i.usuario_id === currentUser.value.id);
   if (index === -1) return null;
   return { ...filaCompradores[index], position: index + 1, isNext: index === 0 };
 });
 
-function abrir() {
-  visible.value = true;
-}
-function cancelar() {
-  visible.value = false;
-}
+const filaCompradoresFiltrada = computed(() => {
+  return filaCompradores.filter(p => {
+    if (filtroFila.item) {
+      const key = filtroFila.item === "Café" ? "cafe" : "filtro";
+      if (!p[key] || p[key] <= 0) return false;
+    }
+    if (filtroFila.usuario) {
+      const search = filtroFila.usuario.toLowerCase();
+      if (!p.usuario.email.toLowerCase().includes(search)) return false;
+    }
+    if (filtroFila.periodo?.inicio && filtroFila.periodo?.fim && p.created_at) {
+      const created = new Date(p.created_at);
+      if (created < filtroFila.periodo.inicio || created > filtroFila.periodo.fim) return false;
+    }
+    return true;
+  });
+});
 
-const formatarDataLocal = (iso) => {
+
+// ------------------------------
+// FUNÇÕES DE FORMATAÇÃO
+// ------------------------------
+const formatarDataLocal = iso => {
   const data = new Date(iso);
-  return `${String(data.getDate()).padStart(2, "0")}/${String(data.getMonth() + 1).padStart(
-    2,
-    "0"
-  )}/${data.getFullYear()} ${String(data.getHours()).padStart(2, "0")}:${String(
-    data.getMinutes()
-  ).padStart(2, "0")}`;
+  return `${String(data.getDate()).padStart(2, "0")}/${
+    String(data.getMonth() + 1).padStart(2, "0")
+  }/${data.getFullYear()} ${String(data.getHours()).padStart(2, "0")}:${String(data.getMinutes()).padStart(2, "0")}`;
 };
 
-const formatarPedidos = (item) => {
+const formatarPedidos = item => {
   if (!item) return "✅ Sem itens de compra definidos";
   const needs = [];
   if (item.cafe > 0) needs.push(`☕ Café x${item.cafe}`);
@@ -479,6 +502,36 @@ const formatarPedidos = (item) => {
   return needs.length ? needs.join(" | ") : "✅ Sem itens de compra definidos";
 };
 
+// ------------------------------
+// FILTROS
+// ------------------------------
+function updatePeriodoText(value) {
+  if (!value || !value.start || !value.end) {
+    periodoText.value = "";
+    filtroFila.periodo = null;
+  } else {
+    periodoText.value = `${formatarDataLocal(value.start)} → ${formatarDataLocal(value.end)}`;
+    filtroFila.periodo = { inicio: new Date(value.start), fim: new Date(value.end) };
+  }
+}
+
+const limparFiltrosFila = () => {
+  filtroFila.item = null;
+  filtroFila.usuario = "";
+  filtroFila.periodo = null;
+  periodoText.value = "";
+  alert("Filtros limpos."); // Ou usar alertMessage se preferir
+};
+
+// ------------------------------
+// DIALOGS
+// ------------------------------
+function abrir() { visible.value = true; }
+function cancelar() { visible.value = false; }
+
+// ------------------------------
+// AÇÕES NA FILA
+// ------------------------------
 const fetchFila = async () => {
   loading.value = true;
   try {
@@ -493,18 +546,13 @@ const fetchFila = async () => {
   }
 };
 
-const adicionarItem = async (tipo) => {
+const adicionarItem = async tipo => {
   if (!currentUser.value || loading.value) return;
   loadingAdicionar.value = true;
-  alertType.value = "info";
   try {
-    if (
-      tipo === "filtro" &&
-      (!currentUserQueueItem.value || currentUserQueueItem.value.cafe <= 0)
-    ) {
+    if (tipo === "filtro" && (!currentUserQueueItem.value || currentUserQueueItem.value.cafe <= 0)) {
       alertMessage.value = "❌ Não pode adicionar filtro antes de adicionar café.";
       alertType.value = "warning";
-      setTimeout(() => (alertMessage.value = null), 5000);
       return;
     }
     const res = await connection.patch(`/fila/adicionar_pedido/${tipo}`);
@@ -520,7 +568,7 @@ const adicionarItem = async (tipo) => {
   }
 };
 
-const removerDaFila = async (filaItem) => {
+const removerDaFila = async filaItem => {
   if (loading.value) return;
   if (!isCurrentUserAdmin.value && filaItem.usuario_id !== currentUser.value?.id) {
     alertMessage.value = "Só pode remover-se a si mesmo da fila.";
@@ -528,13 +576,11 @@ const removerDaFila = async (filaItem) => {
     return;
   }
   loading.value = true;
-  alertType.value = "info";
   try {
     await connection.delete(`/fila/sair/${filaItem.usuario_id}`);
-    alertMessage.value =
-      filaItem.usuario_id === currentUser.value?.id
-        ? `Saiu da fila.`
-        : `${filaItem.usuario.email.split("@")[0]} removido da fila.`;
+    alertMessage.value = filaItem.usuario_id === currentUser.value?.id
+      ? `Saiu da fila.`
+      : `${filaItem.usuario.email.split("@")[0]} removido da fila.`;
     alertType.value = "success";
     await fetchFila();
   } catch (e) {
@@ -546,10 +592,9 @@ const removerDaFila = async (filaItem) => {
   }
 };
 
-const moverParaProximo = async (id) => {
-  if (loading.value || !isCurrentUserAdmin.value) return;
+const moverParaProximo = async id => {
+  if (!isCurrentUserAdmin.value || loading.value) return;
   loading.value = true;
-  alertType.value = "info";
   try {
     const res = await connection.patch(`/fila/mover_proximo/${id}`);
     alertMessage.value = res?.data?.message || "Utilizador movido para a 2ª posição.";
@@ -565,7 +610,7 @@ const moverParaProximo = async (id) => {
 };
 
 const concluirCompra = async () => {
-  if (!proximoComprador.value || loading.value || !isCurrentUserAdmin.value) return;
+  if (!proximoComprador.value || !isCurrentUserAdmin.value || loading.value) return;
   loading.value = true;
   try {
     const res = await connection.post(`/fila/concluir/${proximoComprador.value.usuario_id}`);
@@ -581,6 +626,9 @@ const concluirCompra = async () => {
   }
 };
 
+// ------------------------------
+// USUÁRIO ATUAL
+// ------------------------------
 const loadCurrentUser = async () => {
   loading.value = true;
   const token = localStorage.getItem("jwt_token");
@@ -616,10 +664,14 @@ const handleLogout = () => {
   }, 2000);
 };
 
+// ------------------------------
+// ON MOUNT
+// ------------------------------
 onMounted(async () => {
   await loadCurrentUser();
 });
 </script>
+
 
 <style scoped>
 .app-background {
