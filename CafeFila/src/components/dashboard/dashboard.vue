@@ -1,6 +1,5 @@
 <template>
   <v-app class="app-background">
-    <!-- OVERLAY DE LOADING -->
     <v-overlay
       :model-value="loading"
       class="align-center justify-center"
@@ -16,7 +15,6 @@
       </div>
     </v-overlay>
 
-    <!-- APP BAR -->
     <v-app-bar app color="brown-darken-4" elevation="4">
       <v-container class="py-0 fill-height d-flex justify-space-between align-center">
         <v-toolbar-title
@@ -40,10 +38,8 @@
       </v-container>
     </v-app-bar>
 
-    <!-- CONTEÚDO PRINCIPAL -->
     <v-main>
       <v-container fluid class="pa-4 main-content-padding">
-        <!-- Título e Alert -->
         <v-row>
           <v-col cols="12">
             <h1 class="text-h4 font-weight-black mb-2 text-brown-darken-4">
@@ -67,7 +63,6 @@
           </v-col>
         </v-row>
 
-        <!-- CARD DO USUÁRIO -->
         <v-row class="mb-6">
           <v-col cols="12" md="6">
             <v-card class="pa-6 elevation-6" color="white" rounded="xl">
@@ -79,7 +74,6 @@
               </v-card-title>
               <v-divider class="mt-1 mb-4"></v-divider>
 
-              <!-- Usuário na fila -->
               <template v-if="currentUserQueueItem">
                 <v-sheet
                   :color="currentUserQueueItem.isNext ? 'green-lighten-5' : 'blue-grey-lighten-5'"
@@ -110,14 +104,86 @@
                     </v-chip>
                   </div>
                 </v-sheet>
+                
+                <v-card-text class="py-0">
+                    <div class="text-subtitle-1 font-weight-bold mb-3 text-brown-darken-3">
+                        Gerir Seus Pedidos na Fila:
+                    </div>
 
-                <div class="text-body-1 font-weight-medium mb-4 text-brown-darken-1">
-                  <span class="font-weight-black">Pedidos:</span>
-                  <span class="text-medium-emphasis">{{ formatarPedidos(currentUserQueueItem) }}</span>
-                </div>
+                    <v-row align="center" class="mb-3">
+                      <v-col cols="5" class="pa-1">
+                        <div class="font-weight-medium text-brown-darken-2">☕ Café:</div>
+                      </v-col>
+                      <v-col cols="7" class="pa-1">
+                        <div class="d-flex align-center">
+                          <v-btn
+                            icon="mdi-minus"
+                            size="small"
+                            color="red-lighten-1"
+                            :disabled="currentUserQueueItem.cafe <= 0 || loadingAdicionar"
+                            @click="alterarQuantidade('cafe', -1)"
+                            variant="flat"
+                            class="mr-2"
+                          />
+                          <v-chip
+                            size="large"
+                            color="brown-darken-1"
+                            class="font-weight-bold"
+                          >
+                            {{ currentUserQueueItem.cafe }}
+                          </v-chip>
+                          <v-btn
+                            icon="mdi-plus"
+                            size="small"
+                            color="green-darken-1"
+                            :disabled="loadingAdicionar"
+                            @click="alterarQuantidade('cafe', 1)"
+                            variant="flat"
+                            class="ml-2"
+                          />
+                        </div>
+                      </v-col>
+                    </v-row>
+
+                    <v-row align="center" class="mb-4">
+                      <v-col cols="5" class="pa-1">
+                        <div class="font-weight-medium text-brown-darken-2">🔽 Filtro:</div>
+                      </v-col>
+                      <v-col cols="7" class="pa-1">
+                        <div class="d-flex align-center">
+                          <v-btn
+                            icon="mdi-minus"
+                            size="small"
+                            color="red-lighten-1"
+                            :disabled="currentUserQueueItem.filtro <= 0 || loadingAdicionar"
+                            @click="alterarQuantidade('filtro', -1)"
+                            variant="flat"
+                            class="mr-2"
+                          />
+                          <v-chip
+                            size="large"
+                            color="light-blue-darken-3"
+                            class="font-weight-bold"
+                          >
+                            {{ currentUserQueueItem.filtro }}
+                          </v-chip>
+                          <v-btn
+                            icon="mdi-plus"
+                            size="small"
+                            color="green-darken-1"
+                            :disabled="loadingAdicionar"
+                            @click="alterarQuantidade('filtro', 1)"
+                            variant="flat"
+                            class="ml-2"
+                          />
+                        </div>
+                      </v-col>
+                    </v-row>
+                </v-card-text>
+
+                <v-divider class="my-4"></v-divider>
 
                 <v-btn
-                  v-if="!currentUserQueueItem.isNext"
                   color="red-lighten-1"
                   variant="flat"
                   :loading="loading"
@@ -130,7 +196,6 @@
                 </v-btn>
               </template>
 
-              <!-- Usuário não está na fila -->
               <template v-else>
                 <v-alert
                   type="info"
@@ -139,49 +204,48 @@
                   class="mb-3 rounded-lg"
                   color="blue-grey"
                 >
-                  Não está na fila. Adicione um item abaixo para entrar!
+                  Não está na fila. Adicione um item para entrar!
                 </v-alert>
+                
+                <v-divider class="my-4"></v-divider>
+                
+                <v-card-text class="py-0">
+                    <div class="text-subtitle-1 font-weight-bold mb-3 text-brown-darken-3">
+                        Entrar na Fila:
+                    </div>
+                    <v-row>
+                      <v-col cols="6" class="pa-1">
+                        <v-btn
+                          block
+                          color="brown-darken-1"
+                          @click="alterarQuantidade('cafe', 1)"
+                          :disabled="loadingAdicionar || !currentUser"
+                          prepend-icon="mdi-coffee-maker"
+                          size="large"
+                          variant="flat"
+                        >
+                          Adicionar Café
+                        </v-btn>
+                      </v-col>
+                      <v-col cols="6" class="pa-1">
+                        <v-btn
+                          block
+                          color="light-blue-darken-3"
+                          @click="alterarQuantidade('filtro', 1)"
+                          :disabled="loadingAdicionar || !currentUser"
+                          prepend-icon="mdi-filter-cog"
+                          size="large"
+                          variant="flat"
+                        >
+                          Adicionar Filtro
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                </v-card-text>
               </template>
-
-              <!-- Adicionar Pedido -->
-              <v-divider class="my-4"></v-divider>
-              <v-card-text class="py-0">
-                <div class="text-subtitle-1 font-weight-bold mb-3 text-brown-darken-3">
-                  Adicionar/Atualizar Pedido:
-                </div>
-                <v-row>
-                  <v-col cols="6" class="pa-1">
-                    <v-btn
-                      block
-                      color="brown-darken-1"
-                      @click="adicionarItem('cafe')"
-                      :disabled="loadingAdicionar || !currentUser"
-                      prepend-icon="mdi-coffee-maker"
-                      size="large"
-                      variant="flat"
-                    >
-                      Adicionar Café
-                    </v-btn>
-                  </v-col>
-                  <v-col cols="6" class="pa-1">
-                    <v-btn
-                      block
-                      color="light-blue-darken-3"
-                      @click="adicionarItem('filtro')"
-                      :disabled="loadingAdicionar || !currentUser"
-                      prepend-icon="mdi-filter-cog"
-                      size="large"
-                      variant="flat"
-                    >
-                      Adicionar Filtro
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </v-card-text>
             </v-card>
           </v-col>
 
-          <!-- Próximo comprador -->
           <v-col cols="12" md="6" v-if="proximoComprador">
             <v-card
               color="brown-lighten-5"
@@ -234,7 +298,6 @@
           </v-col>
         </v-row>
 
-        <!-- Fila vazia -->
         <v-row v-if="!loading && filaCompradores.length === 0">
           <v-col cols="12">
             <v-card class="pa-6 text-center elevation-3" color="green-lighten-5" rounded="xl">
@@ -249,8 +312,7 @@
           </v-col>
         </v-row>
 
-        <!-- Lista filtrada da fila -->
-        <v-row v-else-if="filaCompradoresFiltrada.length > 0">
+        <v-row v-else-if="filaCompradoresFiltrada.length > 0 || (filtroAtivo && filaCompradoresFiltrada.length === 0)">
           <v-col cols="12">
             <v-card elevation="4" class="pa-4" rounded="xl">
               <v-card-title
@@ -262,51 +324,64 @@
 
               <v-card-text class="pt-0 pb-2">
                 <v-row align="center" class="mb-3">
-                  <v-col cols="12" md="4">
+                  <v-col cols="12" md="3">
                     <v-select
                       v-model="filtroFila.item"
                       :items="itemOptions"
-                      label="Filtrar por Item"
+                      label="Item"
                       clearable
                       prepend-icon="mdi-coffee"
                       variant="outlined"
                       density="compact"
+                      hide-details
                     />
                   </v-col>
 
-                  <v-col cols="12" md="4">
-                    <v-text-field
-                      v-model="filtroFila.usuario"
-                      label="Filtrar por Usuário"
+                  <v-col cols="12" md="3">
+                    <v-select
+                      v-model="filtroFila.usuarioId"
+                      :items="listaUsuarios"
+                      item-title="email"
+                      item-value="id"
+                      label="Usuário"
                       clearable
                       prepend-icon="mdi-account-search"
                       variant="outlined"
                       density="compact"
+                      hide-details
                     />
                   </v-col>
 
-                  <v-col cols="12" md="4" class="d-flex gap-2">
-                    <v-menu v-model="periodoMenu" :close-on-content-click="false" transition="scale-transition" offset-y>
-                      <template #activator="{ props }">
-                        <v-text-field
-                          v-model="periodoText"
-                          label="Filtrar por Período"
-                          prepend-icon="mdi-calendar-range"
-                          readonly
-                          v-bind="props"
-                          clearable
-                        />
-                      </template>
-                      <v-date-picker
-                        v-model="filtroFila.periodo"
-                        type="range"
-                        @update:model-value="updatePeriodoText"
-                      />
-                    </v-menu>
+                  <v-col cols="12" md="3">
+                    <v-text-field
+                      v-model="filtroFila.dataInicio"
+                      label="Data Início"
+                      placeholder="DD/MM/AAAA"
+                      prepend-icon="mdi-calendar-start"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      maxlength="10"
+                      @input="formatarInputData($event, 'dataInicio')"
+                    />
+                  </v-col>
+
+                  <v-col cols="12" md="3">
+                    <v-text-field
+                      v-model="filtroFila.dataFim"
+                      label="Data Fim"
+                      placeholder="DD/MM/AAAA"
+                      prepend-icon="mdi-calendar-end"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      maxlength="10"
+                      @input="formatarInputData($event, 'dataFim')"
+                    />
                   </v-col>
                 </v-row>
 
-                <v-btn color="grey-darken-1" @click="limparFiltrosFila" variant="text">
+                <v-btn color="grey-darken-1" @click="limparFiltrosFila" variant="text" class="mt-2">
                   Limpar Filtros
                 </v-btn>
               </v-card-text>
@@ -314,64 +389,69 @@
               <v-divider class="mx-4"></v-divider>
 
               <v-list density="default" class="bg-transparent">
-                <v-list-item
-                  v-for="(p, index) in restanteDaFilaFiltrada"
-                  :key="p.usuario_id"
-                  class="my-3 pa-3 rounded-lg list-item-hover"
-                  :class="{
-                    'bg-blue-grey-lighten-5 elevation-1': p.usuario_id === currentUser?.id,
-                    'border-b': p.usuario_id !== currentUser?.id,
-                  }"
-                >
-                  <template v-slot:prepend>
-                    <v-avatar
-                      color="amber-darken-3"
-                      size="48"
-                      class="font-weight-black white--text elevation-1"
-                    >
-                      {{ index + 2 }}
-                    </v-avatar>
-                  </template>
-                  <v-list-item-title class="font-weight-bold text-brown-darken-3 text-capitalize">
-                    {{ p.usuario.email.split("@")[0] }}
-                    <v-chip
-                      v-if="p.usuario_id === currentUser?.id"
-                      color="blue"
-                      size="small"
-                      class="ml-2 font-weight-medium"
-                    >
-                      VOCÊ
-                    </v-chip>
-                  </v-list-item-title>
-                  <v-list-item-subtitle class="mt-1 text-body-2 font-weight-medium">
-                    Itens:
-                    <span class="text-brown-darken-1 font-weight-bold">{{ formatarPedidos(p) }}</span>
-                  </v-list-item-subtitle>
+                <template v-if="restanteDaFilaFiltrada.length > 0">
+                  <v-list-item
+                    v-for="(p, index) in restanteDaFilaFiltrada"
+                    :key="p.usuario_id"
+                    class="my-3 pa-3 rounded-lg list-item-hover"
+                    :class="{
+                      'bg-blue-grey-lighten-5 elevation-1': p.usuario_id === currentUser?.id,
+                      'border-b': p.usuario_id !== currentUser?.id,
+                    }"
+                  >
+                    <template v-slot:prepend>
+                      <v-avatar
+                        color="amber-darken-3"
+                        size="48"
+                        class="font-weight-black white--text elevation-1"
+                      >
+                        {{ filtroAtivo ? index + 1 : index + 2 }}
+                      </v-avatar>
+                    </template>
+                    <v-list-item-title class="font-weight-bold text-brown-darken-3 text-capitalize">
+                      {{ p.usuario.email.split("@")[0] }}
+                      <v-chip
+                        v-if="p.usuario_id === currentUser?.id"
+                        color="blue"
+                        size="small"
+                        class="ml-2 font-weight-medium"
+                      >
+                        VOCÊ
+                      </v-chip>
+                    </v-list-item-title>
+                    <v-list-item-subtitle class="mt-1 text-body-2 font-weight-medium">
+                      Itens:
+                      <span class="text-brown-darken-1 font-weight-bold">{{ formatarPedidos(p) }}</span>
+                    </v-list-item-subtitle>
 
-                  <template v-slot:append>
-                    <v-btn
-                      icon="mdi-arrow-up-circle-outline"
-                      size="small"
-                      variant="text"
-                      color="blue"
-                      title="Mover para a 2ª Posição"
-                      :loading="loading"
-                      :disabled="!isCurrentUserAdmin || loading"
-                      @click="moverParaProximo(p.usuario_id)"
-                      class="mr-2"
-                    />
-                    <v-btn
-                      icon="mdi-trash-can-outline"
-                      size="small"
-                      variant="text"
-                      color="red"
-                      title="Remover da fila"
-                      :loading="loading"
-                      :disabled="!isCurrentUserAdmin || loading"
-                      @click="removerDaFila(p)"
-                    />
-                  </template>
-                </v-list-item>
+                    <template v-slot:append>
+                      <v-btn
+                        icon="mdi-arrow-up-circle-outline"
+                        size="small"
+                        variant="text"
+                        color="blue"
+                        title="Mover para a 2ª Posição"
+                        :loading="loading"
+                        :disabled="!isCurrentUserAdmin || loading"
+                        @click="moverParaProximo(p.usuario_id)"
+                        class="mr-2"
+                      />
+                      <v-btn
+                        icon="mdi-trash-can-outline"
+                        size="small"
+                        variant="text"
+                        color="red"
+                        title="Remover da fila"
+                        :loading="loading"
+                        :disabled="!isCurrentUserAdmin || loading"
+                        @click="removerDaFila(p)"
+                      />
+                    </template>
+                  </v-list-item>
+                </template>
+                <div v-else class="text-center pa-4 text-grey">
+                  Nenhum resultado encontrado para os filtros.
+                </div>
               </v-list>
 
               <v-card-subtitle
@@ -386,13 +466,12 @@
       </v-container>
     </v-main>
 
-    <!-- DIALOG DE INFORMAÇÃO -->
     <v-dialog v-model="showInfoDialog" max-width="600">
       <v-card rounded="xl">
         <v-card-title
           class="text-h5 font-weight-bold bg-brown-darken-4 text-white d-flex justify-space-between"
         >
-          Informações Atuais de Compra (Pesquisa Web)
+          Informações Atuais de Compra
           <v-btn icon="mdi-close" variant="text" color="white" @click="showInfoDialog = false" />
         </v-card-title>
         <v-card-text class="pt-4">
@@ -405,7 +484,6 @@
       </v-card>
     </v-dialog>
 
-    <!-- DIALOG DE LOGOUT -->
     <v-dialog v-model="visible" max-width="400">
       <v-card>
         <v-card-title class="text-h6">Deseja realmente sair?</v-card-title>
@@ -420,17 +498,14 @@
   </v-app>
 </template>
 
-
 <script setup>
 import { ref, reactive, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { connection } from "@/connection/axiosConnection";
 
-// ------------------------------
-// REFS E REACTIVES
-// ------------------------------
 const router = useRouter();
 const filaCompradores = reactive([]);
+const listaUsuarios = reactive([]); 
 const loading = ref(false);
 const loadingAdicionar = ref(false);
 const alertMessage = ref(null);
@@ -443,20 +518,14 @@ const carregando = ref(false);
 
 const filtroFila = reactive({
   item: null,
-  usuario: "",
-  periodo: null,
+  usuarioId: null,
+  dataInicio: "",
+  dataFim: "",
 });
 const itemOptions = ["Café", "Filtro"];
 
-const periodoMenu = ref(false);
-const periodoText = ref("");
-
-// ------------------------------
-// COMPUTED
-// ------------------------------
 const isCurrentUserAdmin = computed(() => !!currentUser.value?.admin);
 const proximoComprador = computed(() => filaCompradores[0] || null);
-const restanteDaFilaFiltrada = computed(() => filaCompradoresFiltrada.value.slice(1));
 const currentUserQueueItem = computed(() => {
   if (!currentUser.value) return null;
   const index = filaCompradores.findIndex(i => i.usuario_id === currentUser.value.id);
@@ -464,28 +533,71 @@ const currentUserQueueItem = computed(() => {
   return { ...filaCompradores[index], position: index + 1, isNext: index === 0 };
 });
 
+const filtroAtivo = computed(() => {
+  return !!(filtroFila.item || filtroFila.usuarioId || (filtroFila.dataInicio && filtroFila.dataInicio.length === 10) || (filtroFila.dataFim && filtroFila.dataFim.length === 10));
+});
+
+const parseDataBR = (dataStr) => {
+  if (!dataStr || dataStr.length !== 10) return null;
+  const [dia, mes, ano] = dataStr.split('/');
+  return new Date(ano, mes - 1, dia);
+};
+
 const filaCompradoresFiltrada = computed(() => {
   return filaCompradores.filter(p => {
     if (filtroFila.item) {
       const key = filtroFila.item === "Café" ? "cafe" : "filtro";
       if (!p[key] || p[key] <= 0) return false;
     }
-    if (filtroFila.usuario) {
-      const search = filtroFila.usuario.toLowerCase();
-      if (!p.usuario.email.toLowerCase().includes(search)) return false;
+    
+    if (filtroFila.usuarioId) {
+      if (p.usuario_id !== filtroFila.usuarioId) return false;
     }
-    if (filtroFila.periodo?.inicio && filtroFila.periodo?.fim && p.created_at) {
-      const created = new Date(p.created_at);
-      if (created < filtroFila.periodo.inicio || created > filtroFila.periodo.fim) return false;
+
+    if (p.created_at) {
+      const dataCriacao = new Date(p.created_at);
+      
+      if (filtroFila.dataInicio && filtroFila.dataInicio.length === 10) {
+        const inicio = parseDataBR(filtroFila.dataInicio);
+        if (inicio) {
+          inicio.setHours(0, 0, 0, 0);
+          if (dataCriacao < inicio) return false;
+        }
+      }
+
+      if (filtroFila.dataFim && filtroFila.dataFim.length === 10) {
+        const fim = parseDataBR(filtroFila.dataFim);
+        if (fim) {
+          fim.setHours(23, 59, 59, 999);
+          if (dataCriacao > fim) return false;
+        }
+      }
     }
+
     return true;
   });
 });
 
+const restanteDaFilaFiltrada = computed(() => {
+  if (filtroAtivo.value) {
+    return filaCompradoresFiltrada.value;
+  }
+  return filaCompradoresFiltrada.value.slice(1);
+});
 
-// ------------------------------
-// FUNÇÕES DE FORMATAÇÃO
-// ------------------------------
+const formatarInputData = (event, campo) => {
+  let valor = event.target.value.replace(/\D/g, ""); 
+  if (valor.length > 8) valor = valor.slice(0, 8);
+
+  if (valor.length >= 5) {
+    valor = valor.slice(0, 2) + "/" + valor.slice(2, 4) + "/" + valor.slice(4);
+  } else if (valor.length >= 3) {
+    valor = valor.slice(0, 2) + "/" + valor.slice(2);
+  }
+  
+  filtroFila[campo] = valor;
+};
+
 const formatarDataLocal = iso => {
   const data = new Date(iso);
   return `${String(data.getDate()).padStart(2, "0")}/${
@@ -502,36 +614,27 @@ const formatarPedidos = item => {
   return needs.length ? needs.join(" | ") : "✅ Sem itens de compra definidos";
 };
 
-// ------------------------------
-// FILTROS
-// ------------------------------
-function updatePeriodoText(value) {
-  if (!value || !value.start || !value.end) {
-    periodoText.value = "";
-    filtroFila.periodo = null;
-  } else {
-    periodoText.value = `${formatarDataLocal(value.start)} → ${formatarDataLocal(value.end)}`;
-    filtroFila.periodo = { inicio: new Date(value.start), fim: new Date(value.end) };
-  }
-}
-
 const limparFiltrosFila = () => {
   filtroFila.item = null;
-  filtroFila.usuario = "";
-  filtroFila.periodo = null;
-  periodoText.value = "";
-  alert("Filtros limpos."); // Ou usar alertMessage se preferir
+  filtroFila.usuarioId = null;
+  filtroFila.dataInicio = "";
+  filtroFila.dataFim = "";
+  alertMessage.value = "Filtros limpos.";
+  alertType.value = "info";
 };
 
-// ------------------------------
-// DIALOGS
-// ------------------------------
 function abrir() { visible.value = true; }
 function cancelar() { visible.value = false; }
 
-// ------------------------------
-// AÇÕES NA FILA
-// ------------------------------
+const fetchUsuarios = async () => {
+  try {
+    const res = await connection.get("/usuarios");
+    listaUsuarios.splice(0, listaUsuarios.length, ...res.data);
+  } catch (e) {
+    console.error("Erro ao buscar usuários", e);
+  }
+};
+
 const fetchFila = async () => {
   loading.value = true;
   try {
@@ -546,27 +649,45 @@ const fetchFila = async () => {
   }
 };
 
-const adicionarItem = async tipo => {
-  if (!currentUser.value || loading.value) return;
+const alterarQuantidade = async (tipo, delta) => {
+  if (!currentUserQueueItem.value) return;
+
   loadingAdicionar.value = true;
+
   try {
-    if (tipo === "filtro" && (!currentUserQueueItem.value || currentUserQueueItem.value.cafe <= 0)) {
-      alertMessage.value = "❌ Não pode adicionar filtro antes de adicionar café.";
-      alertType.value = "warning";
-      return;
-    }
-    const res = await connection.patch(`/fila/adicionar_pedido/${tipo}`);
-    alertMessage.value = res?.data?.message || `Item ${tipo} adicionado`;
+    const novaQuantidade = currentUserQueueItem.value[tipo] + delta;
+
+    if (novaQuantidade < 0) return;
+
+    const token = localStorage.getItem("token");
+
+    const res = await connection.patch(
+      "fila/atualizar_quantidade",
+      {
+        tipo: tipo,
+        quantidade: novaQuantidade
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
     alertType.value = "success";
+    alertMessage.value = res.data.message || "Quantidade atualizada com sucesso";
+
     await fetchFila();
+
   } catch (e) {
-    console.error(e);
-    alertMessage.value = `Falha ao adicionar ${tipo}`;
     alertType.value = "error";
+    alertMessage.value = e.response?.data?.message || "Erro ao atualizar.";
   } finally {
     loadingAdicionar.value = false;
   }
 };
+
+
 
 const removerDaFila = async filaItem => {
   if (loading.value) return;
@@ -626,9 +747,6 @@ const concluirCompra = async () => {
   }
 };
 
-// ------------------------------
-// USUÁRIO ATUAL
-// ------------------------------
 const loadCurrentUser = async () => {
   loading.value = true;
   const token = localStorage.getItem("jwt_token");
@@ -641,6 +759,7 @@ const loadCurrentUser = async () => {
   try {
     const res = await connection.get("/usuarios/me");
     currentUser.value = res.data;
+    await fetchUsuarios(); 
     await fetchFila();
   } catch (e) {
     console.error(e);
@@ -664,14 +783,10 @@ const handleLogout = () => {
   }, 2000);
 };
 
-// ------------------------------
-// ON MOUNT
-// ------------------------------
 onMounted(async () => {
   await loadCurrentUser();
 });
 </script>
-
 
 <style scoped>
 .app-background {
