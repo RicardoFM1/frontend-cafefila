@@ -1,7 +1,7 @@
 <template>
   <v-app class="app-background">
     <v-overlay
-      :model-value="loading"
+      :model-value="loading" 
       class="align-center justify-center"
       persistent
       contained
@@ -106,79 +106,83 @@
                 </v-sheet>
                 
                 <v-card-text class="py-0">
-                    <div class="text-subtitle-1 font-weight-bold mb-3 text-brown-darken-3">
-                        Gerir Seus Pedidos na Fila:
-                    </div>
+                  <div class="text-subtitle-1 font-weight-bold mb-3 text-brown-darken-3">
+                    Gerir Seus Pedidos na Fila:
+                  </div>
 
-                    <v-row align="center" class="mb-3">
-                      <v-col cols="5" class="pa-1">
-                        <div class="font-weight-medium text-brown-darken-2">☕ Café:</div>
-                      </v-col>
-                      <v-col cols="7" class="pa-1">
-                        <div class="d-flex align-center">
-                          <v-btn
-                            icon="mdi-minus"
-                            size="small"
-                            color="red-lighten-1"
-                            :disabled="currentUserQueueItem.cafe <= 0 || loadingAdicionar"
-                            @click="alterarQuantidade('cafe', -1)"
-                            variant="flat"
-                            class="mr-2"
-                          />
-                          <v-chip
-                            size="large"
-                            color="brown-darken-1"
-                            class="font-weight-bold"
-                          >
-                            {{ currentUserQueueItem.cafe }}
-                          </v-chip>
-                          <v-btn
-                            icon="mdi-plus"
-                            size="small"
-                            color="green-darken-1"
-                            :disabled="loadingAdicionar"
-                            @click="alterarQuantidade('cafe', 1)"
-                            variant="flat"
-                            class="ml-2"
-                          />
-                        </div>
-                      </v-col>
-                    </v-row>
+                  <v-row align="center" class="mb-3">
+                    <v-col cols="5" class="pa-1">
+                      <div class="font-weight-medium text-brown-darken-2">☕ Café:</div>
+                    </v-col>
+                    <v-col cols="7" class="pa-1">
+                      <div class="d-flex align-center">
+                        <v-btn
+                          icon="mdi-minus"
+                          size="small"
+                          color="red-lighten-1"
+                          :disabled="currentUserQueueItem.cafe <= 0 || loadingItemUpdate.cafe"
+                          :loading="loadingItemUpdate.cafe === -1"
+                          @click="alterarQuantidade('cafe', -1)"
+                          variant="flat"
+                          class="mr-2"
+                        />
+                        <v-chip
+                          size="large"
+                          color="brown-darken-1"
+                          class="font-weight-bold"
+                        >
+                          {{ currentUserQueueItem.cafe }}
+                        </v-chip>
+                        <v-btn
+                          icon="mdi-plus"
+                          size="small"
+                          color="green-darken-1"
+                          :disabled="loadingItemUpdate.cafe"
+                          :loading="loadingItemUpdate.cafe === 1"
+                          @click="alterarQuantidade('cafe', 1)"
+                          variant="flat"
+                          class="ml-2"
+                        />
+                      </div>
+                    </v-col>
+                  </v-row>
 
-                    <v-row align="center" class="mb-4">
-                      <v-col cols="5" class="pa-1">
-                        <div class="font-weight-medium text-brown-darken-2">🔽 Filtro:</div>
-                      </v-col>
-                      <v-col cols="7" class="pa-1">
-                        <div class="d-flex align-center">
-                          <v-btn
-                            icon="mdi-minus"
-                            size="small"
-                            color="red-lighten-1"
-                            :disabled="currentUserQueueItem.filtro <= 0 || loadingAdicionar"
-                            @click="alterarQuantidade('filtro', -1)"
-                            variant="flat"
-                            class="mr-2"
-                          />
-                          <v-chip
-                            size="large"
-                            color="light-blue-darken-3"
-                            class="font-weight-bold"
-                          >
-                            {{ currentUserQueueItem.filtro }}
-                          </v-chip>
-                          <v-btn
-                            icon="mdi-plus"
-                            size="small"
-                            color="green-darken-1"
-                            :disabled="loadingAdicionar"
-                            @click="alterarQuantidade('filtro', 1)"
-                            variant="flat"
-                            class="ml-2"
-                          />
-                        </div>
-                      </v-col>
-                    </v-row>
+                  <v-row align="center" class="mb-4">
+                    <v-col cols="5" class="pa-1">
+                      <div class="font-weight-medium text-brown-darken-2">🔽 Filtro:</div>
+                    </v-col>
+                    <v-col cols="7" class="pa-1">
+                      <div class="d-flex align-center">
+                        <v-btn
+                          icon="mdi-minus"
+                          size="small"
+                          color="red-lighten-1"
+                          :disabled="currentUserQueueItem.filtro <= 0 || loadingItemUpdate.filtro"
+                          :loading="loadingItemUpdate.filtro === -1"
+                          @click="alterarQuantidade('filtro', -1)"
+                          variant="flat"
+                          class="mr-2"
+                        />
+                        <v-chip
+                          size="large"
+                          color="light-blue-darken-3"
+                          class="font-weight-bold"
+                        >
+                          {{ currentUserQueueItem.filtro }}
+                        </v-chip>
+                        <v-btn
+                          icon="mdi-plus"
+                          size="small"
+                          color="green-darken-1"
+                          :disabled="loadingItemUpdate.filtro"
+                          :loading="loadingItemUpdate.filtro === 1"
+                          @click="alterarQuantidade('filtro', 1)"
+                          variant="flat"
+                          class="ml-2"
+                        />
+                      </div>
+                    </v-col>
+                  </v-row>
                 </v-card-text>
 
                 <v-divider class="my-4"></v-divider>
@@ -210,42 +214,43 @@
                 <v-divider class="my-4"></v-divider>
                 
                 <v-card-text class="py-0">
-                    <div class="text-subtitle-1 font-weight-bold mb-3 text-brown-darken-3">
-                        Entrar na Fila:
-                    </div>
-                    <v-row>
-                      <v-col cols="6" class="pa-1">
-                        <v-btn
-                          block
-                          color="brown-darken-1"
-                          @click="alterarQuantidade('cafe', 1)"
-                          :disabled="loadingAdicionar || !currentUser"
-                          prepend-icon="mdi-coffee-maker"
-                          size="large"
-                          variant="flat"
-                        >
-                          Adicionar Café
-                        </v-btn>
-                      </v-col>
-                      <v-col cols="6" class="pa-1">
-                        <v-btn
-                          block
-                          color="light-blue-darken-3"
-                          @click="alterarQuantidade('filtro', 1)"
-                          :disabled="loadingAdicionar || !currentUser"
-                          prepend-icon="mdi-filter-cog"
-                          size="large"
-                          variant="flat"
-                        >
-                          Adicionar Filtro
-                        </v-btn>
-                      </v-col>
-                    </v-row>
+                  <div class="text-subtitle-1 font-weight-bold mb-3 text-brown-darken-3">
+                    Entrar na Fila:
+                  </div>
+                  <v-row>
+                    <v-col cols="6" class="pa-1">
+                      <v-btn
+                        block
+                        color="brown-darken-1"
+                        @click="alterarQuantidade('cafe', 1)"
+                        :disabled="loadingItemUpdate.cafe || !currentUser"
+                        :loading="loadingItemUpdate.cafe === 1"
+                        prepend-icon="mdi-coffee-maker"
+                        size="large"
+                        variant="flat"
+                      >
+                        Adicionar Café
+                      </v-btn>
+                    </v-col>
+                    <v-col cols="6" class="pa-1">
+                      <v-btn
+                        block
+                        color="light-blue-darken-3"
+                        @click="alterarQuantidade('filtro', 1)"
+                        :disabled="loadingItemUpdate.filtro || !currentUser"
+                        :loading="loadingItemUpdate.filtro === 1"
+                        prepend-icon="mdi-filter-cog"
+                        size="large"
+                        variant="flat"
+                      >
+                        Adicionar Filtro
+                      </v-btn>
+                    </v-col>
+                  </v-row>
                 </v-card-text>
               </template>
             </v-card>
           </v-col>
-
           <v-col cols="12" md="6" v-if="proximoComprador">
             <v-card
               color="brown-lighten-5"
@@ -297,7 +302,6 @@
             </v-card>
           </v-col>
         </v-row>
-
         <v-row v-if="!loading && filaCompradores.length === 0">
           <v-col cols="12">
             <v-card class="pa-6 text-center elevation-3" color="green-lighten-5" rounded="xl">
@@ -465,7 +469,6 @@
         </v-row>
       </v-container>
     </v-main>
-
     <v-dialog v-model="showInfoDialog" max-width="600">
       <v-card rounded="xl">
         <v-card-title
@@ -499,7 +502,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from "vue";
+import { ref, reactive, computed, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { connection } from "@/connection/axiosConnection";
 
@@ -507,7 +510,11 @@ const router = useRouter();
 const filaCompradores = reactive([]);
 const listaUsuarios = reactive([]); 
 const loading = ref(false);
-const loadingAdicionar = ref(false);
+
+const loadingItemUpdate = reactive({
+  cafe: 0,
+  filtro: 0,
+});
 const alertMessage = ref(null);
 const alertType = ref("info");
 const currentUser = ref(null);
@@ -525,13 +532,47 @@ const filtroFila = reactive({
 const itemOptions = ["Café", "Filtro"];
 
 const isCurrentUserAdmin = computed(() => !!currentUser.value?.admin);
+
+// Adicionar um estado reativo para o item do usuário
+const _currentUserQueueItemState = ref(null);
+
 const proximoComprador = computed(() => filaCompradores[0] || null);
+
+// MODIFICADO: Computado agora depende do estado local '_currentUserQueueItemState'
 const currentUserQueueItem = computed(() => {
-  if (!currentUser.value) return null;
-  const index = filaCompradores.findIndex(i => i.usuario_id === currentUser.value.id);
-  if (index === -1) return null;
-  return { ...filaCompradores[index], position: index + 1, isNext: index === 0 };
+  if (!_currentUserQueueItemState.value) return null;
+  const index = filaCompradores.findIndex(i => i.usuario_id === _currentUserQueueItemState.value.usuario_id);
+  // Garante que a posição e isNext estão corretos, mesmo que a lista 'filaCompradores' ainda não tenha sido atualizada pelo fetchFila
+  return { 
+    ..._currentUserQueueItemState.value, 
+    position: index !== -1 ? index + 1 : 1, // Se estiver na lista, pega a posição correta, senão assume a 1ª para novos
+    isNext: index === 0 
+  };
 });
+
+// Watcher para manter o estado local sincronizado com a fila global quando ela muda (ex: após um fetchFila completo)
+watch(filaCompradores, (newFila) => {
+    if (currentUser.value) {
+        const item = newFila.find(i => i.usuario_id === currentUser.value.id);
+        if (item) {
+            _currentUserQueueItemState.value = item;
+        } else if (_currentUserQueueItemState.value && !item) {
+             // Se saiu da fila (manual ou por admin)
+            _currentUserQueueItemState.value = null;
+        }
+    }
+}, { deep: true });
+
+// Inicializa o estado local do item do usuário quando o usuário loga
+watch(currentUser, (newUser) => {
+    if (newUser) {
+        const item = filaCompradores.find(i => i.usuario_id === newUser.id);
+        _currentUserQueueItemState.value = item || null;
+    } else {
+        _currentUserQueueItemState.value = null;
+    }
+});
+
 
 const filtroAtivo = computed(() => {
   return !!(filtroFila.item || filtroFila.usuarioId || (filtroFila.dataInicio && filtroFila.dataInicio.length === 10) || (filtroFila.dataFim && filtroFila.dataFim.length === 10));
@@ -649,18 +690,36 @@ const fetchFila = async () => {
   }
 };
 
+
 const alterarQuantidade = async (tipo, delta) => {
-  if (!currentUserQueueItem.value) return;
+  if (!currentUser.value) return; 
 
-  loadingAdicionar.value = true;
+  const isEntering = delta > 0 && !_currentUserQueueItemState.value;
+  let currentItem = isEntering ? { cafe: 0, filtro: 0, usuario_id: currentUser.value.id, created_at: new Date().toISOString() } : _currentUserQueueItemState.value;
+  
+  if (!currentItem) return; 
 
+  const novaQuantidade = currentItem[tipo] + delta;
+
+  if (novaQuantidade < 0) return;
+
+  
+  let tempItem = { ...currentItem }; 
+  tempItem[tipo] = novaQuantidade;
+  
+ 
+  loadingItemUpdate[tipo] = delta; 
+
+
+  if (isEntering) {
+    _currentUserQueueItemState.value = tempItem;
+  } else {
+  
+    _currentUserQueueItemState.value[tipo] = novaQuantidade; 
+  }
+  
   try {
-    const novaQuantidade = currentUserQueueItem.value[tipo] + delta;
-
-    if (novaQuantidade < 0) return;
-
     const token = localStorage.getItem("token");
-
     const res = await connection.patch(
       "fila/atualizar_quantidade",
       {
@@ -677,16 +736,53 @@ const alterarQuantidade = async (tipo, delta) => {
     alertType.value = "success";
     alertMessage.value = res.data.message || "Quantidade atualizada com sucesso";
 
-    await fetchFila();
+    // 2. Atualização da Fila (Recarrega apenas o item atual, não a fila toda)
+    // Se a API retornar o item atualizado, use-o para evitar um novo fetch
+    if (res.data.filaItem) {
+        _currentUserQueueItemState.value = res.data.filaItem;
+        // Se a posição do item mudou (ex: acabou de entrar), recarrega a fila
+        if (isEntering || res.data.reordenar) { 
+            await fetchFila();
+        }
+    } else {
+        // Se a API for simples (sem retorno de dados do item) e a operação for 'entrar', recarrega a fila para obter a posição
+        if (isEntering) { 
+            await fetchFila();
+        } else {
+            // Se for apenas uma mudança de quantidade (que não altera a posição),
+            // podemos apenas recarregar o item atualizado (mais leve que o fetchFila completo)
+            await fetchCurrentUserItem(); 
+        }
+    }
 
   } catch (e) {
+    // 3. Rollback (Se falhar, reverte a UI e mostra erro)
+    console.error("Erro ao atualizar a quantidade:", e);
+    // Reverter a quantidade na UI (se for para um valor não 0, senão remove o item se for uma falha ao entrar)
+    if (_currentUserQueueItemState.value) {
+        _currentUserQueueItemState.value[tipo] = currentItem[tipo]; // Reverte a quantidade
+    }
+    // E recarrega a fila como fallback de segurança
+    await fetchFila(); 
+
     alertType.value = "error";
-    alertMessage.value = e.response?.data?.message || "Erro ao atualizar.";
+    alertMessage.value = e.response?.data?.message || "Erro ao atualizar. Dados revertidos.";
   } finally {
-    loadingAdicionar.value = false;
+    loadingItemUpdate[tipo] = 0; 
   }
 };
 
+
+const fetchCurrentUserItem = async () => {
+    try {
+        const res = await connection.get(`/fila/${currentUser.value.id}`); 
+        _currentUserQueueItemState.value = res.data; 
+    } catch (e) {
+        console.error("Erro ao buscar item do usuário.", e);
+        // Se falhar ao buscar, talvez seja melhor recarregar a fila toda ou assumir que saiu
+        // Para simplicidade, vamos apenas registar o erro aqui.
+    }
+}
 
 
 const removerDaFila = async filaItem => {
@@ -703,7 +799,8 @@ const removerDaFila = async filaItem => {
       ? `Saiu da fila.`
       : `${filaItem.usuario.email.split("@")[0]} removido da fila.`;
     alertType.value = "success";
-    await fetchFila();
+    // Atualização da fila é necessária, pois a ordem mudou
+    await fetchFila(); 
   } catch (e) {
     console.error(e);
     alertMessage.value = "Falha ao remover da fila";
@@ -720,7 +817,8 @@ const moverParaProximo = async id => {
     const res = await connection.patch(`/fila/mover_proximo/${id}`);
     alertMessage.value = res?.data?.message || "Utilizador movido para a 2ª posição.";
     alertType.value = "success";
-    await fetchFila();
+    // Atualização da fila é necessária, pois a ordem mudou
+    await fetchFila(); 
   } catch (e) {
     console.error(e);
     alertMessage.value = "Falha ao mover utilizador";
@@ -737,7 +835,8 @@ const concluirCompra = async () => {
     const res = await connection.post(`/fila/concluir/${proximoComprador.value.usuario_id}`);
     alertMessage.value = res?.data?.message || "Compra concluída";
     alertType.value = "success";
-    await fetchFila();
+    // Atualização da fila é necessária, pois o item saiu
+    await fetchFila(); 
   } catch (e) {
     console.error(e);
     alertMessage.value = "Falha ao concluir compra";
