@@ -42,13 +42,7 @@
       <v-container fluid class="pa-4 main-content-padding">
         <v-row>
           <v-col cols="12">
-            <h1 class="text-h4 font-weight-black mb-2 text-brown-darken-4">
-              ☕ Gestão de Fila de Compras
-            </h1>
-            <p class="text-subtitle-1 text-medium-emphasis mb-4">
-              Acompanhe quem precisa comprar Café e Filtros em seguida. ID do Utilizador:
-              <span class="font-weight-bold">{{ currentUser?.id || "N/A" }}</span>
-            </p>
+           
 
             <v-alert
               v-if="alertMessage"
@@ -370,19 +364,7 @@
                     />
                   </v-col>
 
-                  <v-col cols="12" md="3">
-                    <v-text-field
-                      v-model="filtroFila.dataFim"
-                      label="Data Fim"
-                      placeholder="DD/MM/AAAA"
-                      prepend-icon="mdi-calendar-end"
-                      variant="outlined"
-                      density="compact"
-                      hide-details
-                      maxlength="10"
-                      @input="formatarInputData($event, 'dataFim')"
-                    />
-                  </v-col>
+                  
                 </v-row>
 
                 <v-btn color="grey-darken-1" @click="limparFiltrosFila" variant="text" class="mt-2">
@@ -835,7 +817,6 @@ const concluirCompra = async () => {
     const res = await connection.post(`/fila/concluir/${proximoComprador.value.usuario_id}`);
     alertMessage.value = res?.data?.message || "Compra concluída";
     alertType.value = "success";
-    // Atualização da fila é necessária, pois o item saiu
     await fetchFila(); 
   } catch (e) {
     console.error(e);
@@ -845,6 +826,8 @@ const concluirCompra = async () => {
     loading.value = false;
   }
 };
+
+
 
 const loadCurrentUser = async () => {
   loading.value = true;
