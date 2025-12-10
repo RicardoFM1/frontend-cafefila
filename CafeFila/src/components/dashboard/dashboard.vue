@@ -354,20 +354,23 @@
                   </v-col>
 
                   <v-col cols="12" md="4" class="py-1">
-                    <v-select
-                      v-model="filtroFila.usuarioId"
-                      :items="listaUsuarios"
-                      :item-title="(item) => item.email.split('@')[0]"
-                      item-value="id"
-                      label="Filtrar Usuário"
-                      clearable
-                      prepend-icon="mdi-account-search"
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details
-                      color="brown-darken-2"
-                    />
-                  </v-col>
+  <v-autocomplete
+    v-model="filtroFila.usuarioId"
+    :items="listaUsuarios"
+    :item-title="(item) => item.email.split('@')[0]"
+    item-value="id"
+    label="Filtrar Usuário"
+    clearable
+    prepend-icon="mdi-account-search"
+    variant="outlined"
+    density="comfortable"
+    hide-details
+    color="brown-darken-2"
+    
+    :custom-filter="filterUser" 
+    no-data-text="Usuário não encontrado"
+  />
+</v-col>
 
                   <v-col cols="12" md="4" class="py-1 d-flex align-center">
                     <v-text-field
@@ -426,7 +429,7 @@
 
                     <v-list-item-subtitle class="mt-2 text-body-2 font-weight-medium">
                       Pedidos:
-                      <v-chip-group class="mt-1">
+                      <v-chip-group width="100" class="mt-1">
                         <v-chip
                           v-if="p.cafe > 0"
                           size="small"
@@ -537,20 +540,23 @@
               <v-card-text class="pt-0 pb-2">
                 <v-row align="center" class="mb-4">
                   <v-col cols="12" md="4" sm="6" class="py-1">
-                    <v-select
-                      v-model="filtroCompras.usuarioId"
-                      :items="listaUsuarios"
-                      :item-title="(item) => item.email.split('@')[0]"
-                      item-value="id"
-                      label="Filtrar por Usuário"
-                      clearable
-                      prepend-icon="mdi-account-circle"
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details
-                      color="brown-darken-2"
-                    />
-                  </v-col>
+  <v-autocomplete
+    v-model="filtroCompras.usuarioId"
+    :items="listaUsuarios"
+    :item-title="(item) => item.email.split('@')[0]"
+    item-value="id"
+    label="Filtrar por Usuário"
+    clearable
+    prepend-icon="mdi-account-circle"
+    variant="outlined"
+    density="comfortable"
+    hide-details
+    color="brown-darken-2"
+
+    :custom-filter="filterUser" 
+    no-data-text="Usuário não encontrado"
+  />
+</v-col>
 
                   <v-col cols="12" md="3" sm="6" class="py-1">
                     <v-select
