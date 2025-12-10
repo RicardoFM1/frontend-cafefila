@@ -1023,6 +1023,7 @@ const loadCurrentUser = async () => {
         alertMessage.value = "Sessão não encontrada";
         alertType.value = "warning";
         loading.value = false;
+        router.push("/login")
         return;
     }
     try {
@@ -1079,6 +1080,9 @@ async function listarCompras() {
 }
 
 onMounted(async () => {
+    if(!localStorage.getItem("token")){
+      router.push("/login")
+    }
     await loadCurrentUser();
     await listarCompras();
 });
