@@ -16,14 +16,6 @@ function isTokenExpired(token: any): boolean {
     return true;
   }
 }
-
-function handleExpiredSession(message: string) {
-  console.warn(message);
-  localStorage.removeItem(TOKEN_STORAGE_KEY);
-  localStorage.removeItem(USER_STORAGE_KEY);
-  window.location.href = "/login";
-}
-
 export const connection = axios.create({
   baseURL: API_BASE_URL,
   timeout: TIMEOUT_MS,
@@ -31,6 +23,26 @@ export const connection = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+function handleExpiredSession(message: string) {
+  connection.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+
+  if (token && token.startsWith("ey")) {
+    if (isTokenExpired(token)) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("usuario");
+      window.location.href = "/login";
+      return Promise.reject("Sessão expirada. Faça login novamente.");
+    }
+
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+})};
+
+
 
 connection.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {

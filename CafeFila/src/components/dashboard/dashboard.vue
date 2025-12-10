@@ -449,7 +449,72 @@
             </v-card>
           </v-col>
         </v-row>
+        <v-row class="mt-8">
+ 
+  <v-col cols="12" md="4">
+    <v-card class="pa-5 elevation-6" rounded="xl" color="blue-grey-lighten-5">
+      <v-card-title class="text-h6 font-weight-bold text-blue-grey-darken-3">
+        <v-icon left class="mr-2">mdi-history</v-icon>
+        Sua Última Compra
+      </v-card-title>
+
+      <v-divider class="my-3"></v-divider>
+
+      <template v-if="ultimaCompra">
+        <div class="text-body-1 text-blue-grey-darken-3 mb-2">
+          <strong>Data:</strong> {{ formatarData(ultimaCompra.data) }}
+        </div>
+        <div class="text-body-1 text-blue-grey-darken-3 mb-2">
+          <strong>Itens:</strong> {{ ultimaCompra.descricao }}
+        </div>
+        <div class="text-body-1 text-blue-grey-darken-3">
+          <strong>Total:</strong> {{ ultimaCompra.total }} unid.
+        </div>
+      </template>
+
+      <template v-else>
+        <v-alert type="info" variant="tonal" color="blue-grey">
+          Ainda não realizou compras.
+        </v-alert>
+      </template>
+    </v-card>
+  </v-col>
+
+  
+  <v-col cols="12" md="8">
+    <v-card class="pa-5 elevation-6" rounded="xl">
+      <v-card-title class="text-h6 font-weight-bold text-brown-darken-3">
+        <v-icon left class="mr-2">mdi-cart-outline</v-icon>
+        Histórico de Compras
+      </v-card-title>
+
+      <v-divider class="my-3"></v-divider>
+
+      <v-data-table
+        :headers="headersCompras"
+        :items="listaCompras"
+        item-key="id"
+        density="comfortable"
+        class="elevation-1"
+        no-data-text="Nenhuma compra encontrada"
+      >
+        <template #item.data="{ item }">
+          {{ formatarData(item.data) }}
+        </template>
+
+        <template #item.item="{ item }">
+          {{ item.item }}
+        </template>
+
+        <template #item.quantidade="{ item }">
+          {{ item.quantidade }}
+        </template>
+      </v-data-table>
+    </v-card>
+  </v-col>
+</v-row>
       </v-container>
+      
     </v-main>
     <v-dialog v-model="showInfoDialog" max-width="600">
       <v-card rounded="xl">
@@ -492,6 +557,23 @@ const router = useRouter();
 const filaCompradores = reactive([]);
 const listaUsuarios = reactive([]); 
 const loading = ref(false);
+const listaCompras = ref([]); 
+const ultimaCompra = ref(null);
+
+const headersCompras = ref([
+    { title: 'Data', key: 'data' },
+    { title: 'Usuário', key: 'usuario.email' }, 
+    { title: 'Descrição', key: 'descricao' },
+    { title: 'Total de Itens', key: 'total' },
+]);
+
+const formatarData = (iso) => {
+    if (!iso) return 'N/A';
+    const data = new Date(iso);
+    return `${String(data.getDate()).padStart(2, "0")}/${
+        String(data.getMonth() + 1).padStart(2, "0")
+    }/${data.getFullYear()} ${String(data.getHours()).padStart(2, "0")}:${String(data.getMinutes()).padStart(2, "0")}`;
+};
 
 const loadingItemUpdate = reactive({
   cafe: 0,
@@ -515,37 +597,37 @@ const itemOptions = ["Café", "Filtro"];
 
 const isCurrentUserAdmin = computed(() => !!currentUser.value?.admin);
 
-// Adicionar um estado reativo para o item do usuário
+
 const _currentUserQueueItemState = ref(null);
 
 const proximoComprador = computed(() => filaCompradores[0] || null);
 
-// MODIFICADO: Computado agora depende do estado local '_currentUserQueueItemState'
+
 const currentUserQueueItem = computed(() => {
   if (!_currentUserQueueItemState.value) return null;
   const index = filaCompradores.findIndex(i => i.usuario_id === _currentUserQueueItemState.value.usuario_id);
-  // Garante que a posição e isNext estão corretos, mesmo que a lista 'filaCompradores' ainda não tenha sido atualizada pelo fetchFila
+ 
   return { 
     ..._currentUserQueueItemState.value, 
-    position: index !== -1 ? index + 1 : 1, // Se estiver na lista, pega a posição correta, senão assume a 1ª para novos
+    position: index !== -1 ? index + 1 : 1,
     isNext: index === 0 
   };
 });
 
-// Watcher para manter o estado local sincronizado com a fila global quando ela muda (ex: após um fetchFila completo)
+
 watch(filaCompradores, (newFila) => {
     if (currentUser.value) {
         const item = newFila.find(i => i.usuario_id === currentUser.value.id);
         if (item) {
             _currentUserQueueItemState.value = item;
         } else if (_currentUserQueueItemState.value && !item) {
-             // Se saiu da fila (manual ou por admin)
+         
             _currentUserQueueItemState.value = null;
         }
     }
 }, { deep: true });
 
-// Inicializa o estado local do item do usuário quando o usuário loga
+
 watch(currentUser, (newUser) => {
     if (newUser) {
         const item = filaCompradores.find(i => i.usuario_id === newUser.id);
@@ -718,33 +800,32 @@ const alterarQuantidade = async (tipo, delta) => {
     alertType.value = "success";
     alertMessage.value = res.data.message || "Quantidade atualizada com sucesso";
 
-    // 2. Atualização da Fila (Recarrega apenas o item atual, não a fila toda)
-    // Se a API retornar o item atualizado, use-o para evitar um novo fetch
+    
+  
     if (res.data.filaItem) {
         _currentUserQueueItemState.value = res.data.filaItem;
-        // Se a posição do item mudou (ex: acabou de entrar), recarrega a fila
+       
         if (isEntering || res.data.reordenar) { 
             await fetchFila();
         }
     } else {
-        // Se a API for simples (sem retorno de dados do item) e a operação for 'entrar', recarrega a fila para obter a posição
+      
         if (isEntering) { 
             await fetchFila();
         } else {
-            // Se for apenas uma mudança de quantidade (que não altera a posição),
-            // podemos apenas recarregar o item atualizado (mais leve que o fetchFila completo)
+       
             await fetchCurrentUserItem(); 
         }
     }
 
   } catch (e) {
-    // 3. Rollback (Se falhar, reverte a UI e mostra erro)
+   
     console.error("Erro ao atualizar a quantidade:", e);
-    // Reverter a quantidade na UI (se for para um valor não 0, senão remove o item se for uma falha ao entrar)
+   
     if (_currentUserQueueItemState.value) {
-        _currentUserQueueItemState.value[tipo] = currentItem[tipo]; // Reverte a quantidade
+        _currentUserQueueItemState.value[tipo] = currentItem[tipo]; 
     }
-    // E recarrega a fila como fallback de segurança
+   
     await fetchFila(); 
 
     alertType.value = "error";
@@ -761,8 +842,7 @@ const fetchCurrentUserItem = async () => {
         _currentUserQueueItemState.value = res.data; 
     } catch (e) {
         console.error("Erro ao buscar item do usuário.", e);
-        // Se falhar ao buscar, talvez seja melhor recarregar a fila toda ou assumir que saiu
-        // Para simplicidade, vamos apenas registar o erro aqui.
+      
     }
 }
 
@@ -781,7 +861,7 @@ const removerDaFila = async filaItem => {
       ? `Saiu da fila.`
       : `${filaItem.usuario.email.split("@")[0]} removido da fila.`;
     alertType.value = "success";
-    // Atualização da fila é necessária, pois a ordem mudou
+  
     await fetchFila(); 
   } catch (e) {
     console.error(e);
@@ -799,7 +879,7 @@ const moverParaProximo = async id => {
     const res = await connection.patch(`/fila/mover_proximo/${id}`);
     alertMessage.value = res?.data?.message || "Utilizador movido para a 2ª posição.";
     alertType.value = "success";
-    // Atualização da fila é necessária, pois a ordem mudou
+ 
     await fetchFila(); 
   } catch (e) {
     console.error(e);
@@ -865,8 +945,36 @@ const handleLogout = () => {
   }, 2000);
 };
 
+
+
+async function listarCompras() {
+    try {
+        const res = await connection.get("/compras");
+        if (res.status === 200) {
+            listaCompras.value = res.data; 
+
+            if (listaCompras.value.length > 0 && currentUser.value) {
+                
+                const userCompras = listaCompras.value
+                    .filter(c => c.usuario_id === currentUser.value.id)
+                    .sort((a, b) => new Date(b.data) - new Date(a.data)); 
+                
+                
+                if (userCompras.length > 0) {
+                    ultimaCompra.value = userCompras[0];
+                } else {
+                    ultimaCompra.value = null;
+                }
+            }
+        }
+    } catch (err) {
+        console.error("Erro ao listar compras:", err);
+    }
+}
+
 onMounted(async () => {
   await loadCurrentUser();
+  await listarCompras();
 });
 </script>
 
