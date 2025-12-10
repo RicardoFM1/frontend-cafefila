@@ -107,82 +107,70 @@
                   </div>
 
                   <v-row align="center" class="mb-3">
-                    <v-col cols="12" sm="5" class="py-1">
-                      <div class="font-weight-bold text-brown-darken-2 d-flex align-center text-subtitle-1">
-                        <v-icon color="brown-darken-2" class="mr-2" size="24">mdi-coffee-outline</v-icon> Café:
-                      </div>
-                    </v-col>
-                    <v-col cols="12" sm="7" class="py-1">
-                      <div class="d-flex align-center justify-end">
-                        <v-btn
-                          icon="mdi-minus"
-                          size="small"
-                          color="red-lighten-1"
-                          :disabled="currentUserQueueItem.cafe <= 0 || loadingItemUpdate.cafe"
-                          :loading="loadingItemUpdate.cafe === -1"
-                          @click="alterarQuantidade('cafe', -1)"
-                          variant="flat"
-                          class="mr-2"
-                        />
-                        <v-chip
-                          size="x-large"
-                          color="brown-darken-1"
-                          class="font-weight-black text-white"
-                        >
-                          {{ currentUserQueueItem.cafe }}
-                        </v-chip>
-                        <v-btn
-                          icon="mdi-plus"
-                          size="small"
-                          color="green-darken-1"
-                          :disabled="loadingItemUpdate.cafe"
-                          :loading="loadingItemUpdate.cafe === 1"
-                          @click="alterarQuantidade('cafe', 1)"
-                          variant="flat"
-                          class="ml-2"
-                        />
-                      </div>
-                    </v-col>
-                  </v-row>
+    <v-col cols="12" sm="5" class="py-1">
+        <div class="font-weight-bold text-brown-darken-2 d-flex align-center text-subtitle-1">
+            <v-icon color="brown-darken-2" class="mr-2" size="24">mdi-coffee-outline</v-icon> Café:
+        </div>
+    </v-col>
+    <v-col cols="12" sm="7" class="py-1">
+        <div class="d-flex align-center justify-end">
+            <v-text-field
+                v-model.number="quantidadeCafeDesejada"
+                type="number"
+                min="0"
+                density="compact"
+                variant="outlined"
+                hide-details
+                style="max-width: 150px;" 
+                class="text-center font-weight-black"
+                
+                :disabled="loadingItemUpdate.cafe"
+                
+                @blur="atualizarPedido('cafe')" 
+            >
+                <template #append-inner>
+                    <v-icon size="small" @click="incrementarQuantidadeLocal('cafe', 1)" :disabled="loadingItemUpdate.cafe">mdi-plus</v-icon>
+                </template>
+                <template #prepend-inner>
+                    <v-icon size="small" @click="incrementarQuantidadeLocal('cafe', -1)" :disabled="loadingItemUpdate.cafe">mdi-minus</v-icon>
+                </template>
+            </v-text-field>
+        </div>
+    </v-col>
+</v-row>
 
-                  <v-row align="center" class="mb-4">
-                    <v-col cols="12" sm="5" class="py-1">
-                      <div class="font-weight-bold text-brown-darken-2 d-flex align-center text-subtitle-1">
-                        <v-icon color="light-blue-darken-3" class="mr-2" size="24">mdi-filter</v-icon> Filtro:
-                      </div>
-                    </v-col>
-                    <v-col cols="12" sm="7" class="py-1">
-                      <div class="d-flex align-center justify-end">
-                        <v-btn
-                          icon="mdi-minus"
-                          size="small"
-                          color="red-lighten-1"
-                          :disabled="currentUserQueueItem.filtro <= 0 || loadingItemUpdate.filtro"
-                          :loading="loadingItemUpdate.filtro === -1"
-                          @click="alterarQuantidade('filtro', -1)"
-                          variant="flat"
-                          class="mr-2"
-                        />
-                        <v-chip
-                          size="x-large"
-                          color="light-blue-darken-3"
-                          class="font-weight-black text-white"
-                        >
-                          {{ currentUserQueueItem.filtro }}
-                        </v-chip>
-                        <v-btn
-                          icon="mdi-plus"
-                          size="small"
-                          color="green-darken-1"
-                          :disabled="loadingItemUpdate.filtro"
-                          :loading="loadingItemUpdate.filtro === 1"
-                          @click="alterarQuantidade('filtro', 1)"
-                          variant="flat"
-                          class="ml-2"
-                        />
-                      </div>
-                    </v-col>
-                  </v-row>
+                 <v-row align="center" class="mb-4">
+    <v-col cols="12" sm="5" class="py-1">
+        <div class="font-weight-bold text-brown-darken-2 d-flex align-center text-subtitle-1">
+            <v-icon color="light-blue-darken-3" class="mr-2" size="24">mdi-filter</v-icon> Filtro:
+        </div>
+    </v-col>
+    <v-col cols="12" sm="7" class="py-1">
+        <div class="d-flex align-center justify-end">
+            <v-text-field
+                v-model.number="quantidadeFiltroDesejada"
+                type="number"
+                min="0"
+                density="compact"
+                variant="outlined"
+                hide-details
+                style="max-width: 150px;"
+                class="text-center font-weight-black"
+                
+                :disabled="loadingItemUpdate.filtro"
+                
+                @blur="atualizarPedido('filtro')"
+            >
+                <template #append-inner>
+                    <v-icon size="small" @click="incrementarQuantidadeLocal('filtro', 1)" :disabled="loadingItemUpdate.filtro">mdi-plus</v-icon>
+                </template>
+                <template #prepend-inner>
+                    <v-icon size="small" @click="incrementarQuantidadeLocal('filtro', -1)" :disabled="loadingItemUpdate.filtro">mdi-minus</v-icon>
+                </template>
+            </v-text-field>
+        </div>
+    </v-col>
+</v-row>
                 </v-card-text>
 
                 <v-divider class="my-4"></v-divider>
@@ -429,7 +417,7 @@
 
                     <v-list-item-subtitle class="mt-2 text-body-2 font-weight-medium">
                       Pedidos:
-                      <v-chip-group width="100" class="mt-1">
+                      <v-chip-group class="mt-1">
                         <v-chip
                           v-if="p.cafe > 0"
                           size="small"
@@ -695,9 +683,13 @@ const formatarData = (iso) => {
 };
 
 const loadingItemUpdate = reactive({
-    cafe: 0,
-    filtro: 0,
+    cafe: false,
+    filtro: false,
 });
+
+const quantidadeCafeDesejada = ref(0);
+const quantidadeFiltroDesejada = ref(0);
+
 const alertMessage = ref(null);
 const alertType = ref("info");
 const currentUser = ref(null);
@@ -736,6 +728,17 @@ const currentUserQueueItem = computed(() => {
         isNext: index === 0 
     };
 });
+
+
+watch(currentUserQueueItem, (newVal) => {
+    if (newVal) {
+        quantidadeCafeDesejada.value = newVal.cafe;
+        quantidadeFiltroDesejada.value = newVal.filtro;
+    } else {
+        quantidadeCafeDesejada.value = 0;
+        quantidadeFiltroDesejada.value = 0;
+    }
+}, { immediate: true, deep: true });
 
 
 watch(filaCompradores, (newFila) => {
@@ -884,6 +887,12 @@ const limparFiltrosCompras = () => {
 function abrir() { visible.value = true; }
 function cancelar() { visible.value = false; }
 
+const filterUser = (itemTitle, queryText, item) => {
+    const username = item.raw.email.split('@')[0].toLowerCase();
+    const searchText = queryText.toLowerCase();
+    return username.indexOf(searchText) > -1;
+};
+
 const fetchUsuarios = async () => {
     try {
         const res = await connection.get("/usuarios");
@@ -907,34 +916,29 @@ const fetchFila = async () => {
     }
 };
 
+const incrementarQuantidadeLocal = (tipo, delta) => {
+    if (tipo === 'cafe') {
+        quantidadeCafeDesejada.value = Math.max(0, quantidadeCafeDesejada.value + delta);
+    } else if (tipo === 'filtro') {
+        quantidadeFiltroDesejada.value = Math.max(0, quantidadeFiltroDesejada.value + delta);
+    }
+};
 
-const alterarQuantidade = async (tipo, delta) => {
+const atualizarPedido = async (tipo) => {
     if (!currentUser.value) return; 
 
-    const isEntering = delta > 0 && !_currentUserQueueItemState.value;
-    let currentItem = isEntering ? { cafe: 0, filtro: 0, usuario_id: currentUser.value.id, created_at: new Date().toISOString() } : _currentUserQueueItemState.value;
+    const novaQuantidade = tipo === 'cafe' ? quantidadeCafeDesejada.value : quantidadeFiltroDesejada.value;
     
-    if (!currentItem) return; 
-
-    const novaQuantidade = currentItem[tipo] + delta;
-
-    if (novaQuantidade < 0) return;
-
+    const quantidadeAtualNaFila = currentUserQueueItem.value ? currentUserQueueItem.value[tipo] : 0;
     
-    let tempItem = { ...currentItem }; 
-    tempItem[tipo] = novaQuantidade;
-    
-    
-    loadingItemUpdate[tipo] = delta; 
-
-
-    if (isEntering) {
-        _currentUserQueueItemState.value = tempItem;
-    } else {
-    
-        _currentUserQueueItemState.value[tipo] = novaQuantidade; 
+    if (novaQuantidade === quantidadeAtualNaFila) {
+        return; 
     }
     
+    loadingItemUpdate[tipo] = true; 
+    
+    const quantidadeReverter = quantidadeAtualNaFila;
+
     try {
         const token = localStorage.getItem("jwt_token");
         const res = await connection.patch(
@@ -952,31 +956,23 @@ const alterarQuantidade = async (tipo, delta) => {
 
         alertType.value = "success";
         alertMessage.value = res.data.message || "Quantidade atualizada com sucesso";
-
         
-    
         if (res.data.filaItem) {
             _currentUserQueueItemState.value = res.data.filaItem;
-            
-            if (isEntering || res.data.reordenar) { 
-                await fetchFila();
+            if (res.data.reordenar || (novaQuantidade > 0 && quantidadeAtualNaFila === 0) || (novaQuantidade === 0 && quantidadeAtualNaFila > 0)) {
+                 await fetchFila();
             }
         } else {
-          
-            if (isEntering) { 
-                await fetchFila();
-            } else {
-            
-                await fetchCurrentUserItem(); 
-            }
+             await fetchFila();
         }
 
     } catch (e) {
-      
         console.error("Erro ao atualizar a quantidade:", e);
         
-        if (_currentUserQueueItemState.value) {
-            _currentUserQueueItemState.value[tipo] = currentItem[tipo]; 
+        if (tipo === 'cafe') {
+            quantidadeCafeDesejada.value = quantidadeReverter;
+        } else if (tipo === 'filtro') {
+            quantidadeFiltroDesejada.value = quantidadeReverter;
         }
         
         await fetchFila(); 
@@ -984,7 +980,7 @@ const alterarQuantidade = async (tipo, delta) => {
         alertType.value = "error";
         alertMessage.value = e.response?.data?.message || "Erro ao atualizar. Dados revertidos.";
     } finally {
-        loadingItemUpdate[tipo] = 0; 
+        loadingItemUpdate[tipo] = false; 
     }
 };
 
@@ -995,7 +991,6 @@ const fetchCurrentUserItem = async () => {
         _currentUserQueueItemState.value = res.data; 
     } catch (e) {
         console.error("Erro ao buscar item do usuário.", e);
-      
     }
 }
 
@@ -1055,7 +1050,6 @@ const concluirCompra = async () => {
         alertType.value = "success";
         await fetchFila(); 
         await listarCompras(); 
-      
     } catch (e) {
         console.error(e);
         alertMessage.value = "Falha ao concluir compra";
