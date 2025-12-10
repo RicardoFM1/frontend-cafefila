@@ -110,10 +110,10 @@ const handleLogin = async () => {
         const response = await connection.post('/usuarios/login', credentials);
         
         const token = response.data.token;
-        const usuario = response.data.usuario; 
+        
 
         localStorage.setItem('jwt_token', token);
-        localStorage.setItem('usuario', JSON.stringify(usuario));
+      
 
         router.push('/'); 
 

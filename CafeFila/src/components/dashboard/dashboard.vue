@@ -1080,9 +1080,7 @@ async function listarCompras() {
 }
 
 onMounted(async () => {
-    if(!localStorage.getItem("token")){
-      router.push("/login")
-    }
+    
     await loadCurrentUser();
     await listarCompras();
 });
