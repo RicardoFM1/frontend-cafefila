@@ -428,7 +428,7 @@
                         prepend-icon="mdi-coffee"
                         class="font-weight-bold"
                     >
-                        {{ p.cafe }} Café
+                        {{ p.cafe }}x Café
                     </v-chip>
                     <v-chip
                         v-if="p.filtro > 0"
@@ -437,14 +437,14 @@
                         prepend-icon="mdi-filter"
                         class="font-weight-bold"
                     >
-                        {{ p.filtro }} Filtro
+                        {{ p.filtro }}x Filtro
                     </v-chip>
                 </v-chip-group>
             </div>
             
             <v-list-item-subtitle class="mt-1 text-caption text-grey-darken-1">
                  <v-icon size="small" class="mr-1">mdi-clock-time-four-outline</v-icon>
-                 Desde: {{ formatarData(p.data_criacao) }}
+                 Desde: {{ formatarData(p.created_at) }}
             </v-list-item-subtitle>
 
             <template v-slot:append>
@@ -511,7 +511,7 @@
                   <v-chip size="small" color="blue-grey-darken-2" class="ml-1 font-weight-bold">{{ ultimaCompra.descricao }}</v-chip>
                 </div>
                 <div class="text-body-1 text-blue-grey-darken-3">
-                  <strong class="font-weight-bold">💲 Total:</strong>
+                  <strong class="font-weight-bold">Total:</strong>
                   <v-chip size="small" color="brown-darken-1" class="ml-1 font-weight-black">
                     {{ ultimaCompra.total }} unid.
                   </v-chip>
@@ -694,12 +694,13 @@ const formatarData = (isoDate) => {
     const options = {
         day: '2-digit',
         month: '2-digit',
+        year: '4-digit',
         hour: '2-digit',
         minute: '2-digit',
         
     };
 
-    // Formata a data para DD/MM HH:mm
+   
     return date.toLocaleString('pt-BR', options);
 };
 
@@ -827,7 +828,7 @@ const listaComprasFiltrada = computed(() => {
     if (!listaCompras.value) return [];
     
     return listaCompras.value.filter(compra => {
-        const { usuarioId, item, data } = filtroCompras;
+        const { usuarioId, item, data } = filtroCompras.value; 
         let pass = true;
 
         if (usuarioId !== null && compra.usuario_id !== usuarioId) {
@@ -841,12 +842,17 @@ const listaComprasFiltrada = computed(() => {
             }
         }
         
+        
         if (data && data.length === 10) {
-            const compraDate = formatarData(compra.data).split(' ')[0]; 
+           
+            const compraDate = formatarData(compra.data); 
+            
+          
             if (compraDate !== data) {
                 pass = false;
             }
         }
+       
 
         return pass;
     });
