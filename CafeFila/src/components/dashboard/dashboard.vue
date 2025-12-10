@@ -211,7 +211,7 @@
                       <v-btn
                         block
                         color="brown-darken-1"
-                        @click="alterarQuantidade('cafe', 1)"
+                        @click="atualizarPedido('cafe', 1)"
                         :disabled="loadingItemUpdate.cafe || !currentUser"
                         :loading="loadingItemUpdate.cafe === 1"
                         prepend-icon="mdi-coffee-maker-outline"
@@ -226,7 +226,7 @@
                       <v-btn
                         block
                         color="light-blue-darken-3"
-                        @click="alterarQuantidade('filtro', 1)"
+                        @click="atualizarPedido('filtro', 1)"
                         :disabled="loadingItemUpdate.filtro || !currentUser"
                         :loading="loadingItemUpdate.filtro === 1"
                         prepend-icon="mdi-filter-cog-outline"
@@ -381,7 +381,7 @@
 
               <v-divider class="mx-4"></v-divider>
 
-              <v-list density="default" class="bg-transparent pa-2">
+            <v-list density="default" class="bg-transparent pa-2">
     <template v-if="restanteDaFilaFiltrada.length > 0">
         <v-list-item
             v-for="(p, index) in restanteDaFilaFiltrada"
@@ -441,6 +441,12 @@
                     </v-chip>
                 </v-chip-group>
             </div>
+            
+            <v-list-item-subtitle class="mt-1 text-caption text-grey-darken-1">
+                 <v-icon size="small" class="mr-1">mdi-clock-time-four-outline</v-icon>
+                 Desde: {{ formatarData(p.data_criacao) }}
+            </v-list-item-subtitle>
+
             <template v-slot:append>
                 <div class="d-flex align-center">
                     <v-btn
@@ -481,12 +487,7 @@
     Ações de gestão de fila reservadas para administradores.
 </v-card-subtitle>
 
-              <v-card-subtitle
-                v-if="!isCurrentUserAdmin"
-                class="text-red-darken-2 text-right mt-2 font-italic text-caption"
-              >
-                Ações de gestão de fila reservadas para administradores.
-              </v-card-subtitle>
+              
             </v-card>
           </v-col>
         </v-row>
@@ -683,12 +684,23 @@ const headersCompras = ref([
     { title: 'Total de Itens', key: 'total' },
 ]);
 
-const formatarData = (iso) => {
-    if (!iso) return 'N/A';
-    const data = new Date(iso);
-    return `${String(data.getDate()).padStart(2, "0")}/${
-        String(data.getMonth() + 1).padStart(2, "0")
-    }/${data.getFullYear()} ${String(data.getHours()).padStart(2, "0")}:${String(data.getMinutes()).padStart(2, "0")}`;
+const formatarData = (isoDate) => {
+    if (!isoDate) return 'N/A';
+    
+    
+    const date = new Date(isoDate);
+
+    
+    const options = {
+        day: '2-digit',
+        month: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        
+    };
+
+    // Formata a data para DD/MM HH:mm
+    return date.toLocaleString('pt-BR', options);
 };
 
 const loadingItemUpdate = reactive({
@@ -933,16 +945,27 @@ const incrementarQuantidadeLocal = (tipo, delta) => {
     }
 };
 
-const atualizarPedido = async (tipo) => {
+const atualizarPedido = async (tipo, quantidadePadrao = null) => {
     if (!currentUser.value) return; 
 
-    const novaQuantidade = tipo === 'cafe' ? quantidadeCafeDesejada.value : quantidadeFiltroDesejada.value;
+    const quantidadeRef = tipo === 'cafe' ? quantidadeCafeDesejada : quantidadeFiltroDesejada;
+    
+   
+    if (quantidadePadrao !== null) {
+       
+        quantidadeRef.value = quantidadePadrao; 
+    }
+    
+   
+    const novaQuantidade = quantidadeRef.value;
     
     const quantidadeAtualNaFila = currentUserQueueItem.value ? currentUserQueueItem.value[tipo] : 0;
+    
     
     if (novaQuantidade === quantidadeAtualNaFila) {
         return; 
     }
+    
     
     loadingItemUpdate[tipo] = true; 
     
