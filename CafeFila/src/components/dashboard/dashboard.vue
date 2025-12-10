@@ -1,45 +1,46 @@
 <template>
   <v-app class="app-background">
     <v-overlay
-      :model-value="loading" 
-      class="align-center justify-center"
+      :model-value="loading"
+      class="align-center justify-center opacity-75"
       persistent
       contained
       z-index="9999"
     >
       <div class="text-center">
-        <v-progress-circular indeterminate color="amber-lighten-3" size="72" width="8" />
-        <p class="mt-4 text-h6 font-weight-bold text-white">
-          A Carregar Dados da Fila...
+        <v-progress-circular indeterminate color="amber-lighten-3" size="90" width="10" />
+        <p class="mt-6 text-h5 font-weight-bold text-white">
+          ☕ A Carregar Dados da Fila...
         </p>
       </div>
     </v-overlay>
 
-    <v-app-bar app color="brown-darken-4" elevation="4">
+    <v-app-bar app color="brown-darken-3" elevation="8">
       <v-container class="py-0 fill-height d-flex justify-space-between align-center">
         <v-toolbar-title
-          class="text-amber-lighten-3 font-weight-black text-h5 text-center flex-grow-1"
+          class="text-amber-lighten-2 font-weight-black text-h4 flex-grow-1 text-md-left text-center"
         >
-          <v-icon class="mr-2">mdi-coffee-to-go</v-icon>
-          DASHBOARD DE FILA DE CAFÉ
+          <v-icon size="32" class="mr-2">mdi-coffee-to-go</v-icon>
+          DASHBOARD DE CAFÉ
         </v-toolbar-title>
         <v-btn
-          variant="text"
+          variant="flat"
           color="white"
           prepend-icon="mdi-exit-to-app"
-          class="font-weight-medium"
+          class="font-weight-medium rounded-pill"
           @click="abrir"
+          size="large"
         >
           Sair
-          <span v-if="currentUser" class="ml-1 d-none d-sm-inline font-weight-light text-capitalize">
+          <span v-if="currentUser" class="ml-1 d-none d-sm-inline font-weight-bold text-brown-darken-3 text-capitalize">
             ({{ currentUser.email.split("@")[0] }})
           </span>
         </v-btn>
       </v-container>
     </v-app-bar>
 
-    <v-main>
-      <v-container fluid class="pa-4 main-content-padding">
+    <v-main class="bg-grey-lighten-3">
+      <v-container fluid class="pa-4 pa-sm-6 main-content-padding">
         <v-row>
           <v-col cols="12">
             <v-alert
@@ -47,8 +48,11 @@
               :type="alertType"
               variant="flat"
               closable
-              class="my-4 elevation-2 rounded-lg"
+              class="my-2 elevation-4 rounded-lg"
               @click:close="alertMessage = null"
+              border="start"
+              border-color="black"
+              prominent
             >
               {{ alertMessage }}
             </v-alert>
@@ -57,11 +61,11 @@
 
         <v-row v-if="!loading" class="mb-6">
           <v-col cols="12" md="6">
-            <v-card class="pa-6 elevation-6" color="white" rounded="xl">
+            <v-card class="pa-6 elevation-10" color="white" rounded="xl" border>
               <v-card-title
-                class="text-h5 font-weight-bold text-brown-darken-3 d-flex align-center"
+                class="text-h5 font-weight-black text-brown-darken-3 d-flex align-center pb-2"
               >
-                <v-icon left size="28" class="mr-2">mdi-account-check</v-icon>
+                <v-icon size="32" class="mr-3 text-amber-darken-3">mdi-account-circle</v-icon>
                 O seu Estado na Fila
               </v-card-title>
               <v-divider class="mt-1 mb-4"></v-divider>
@@ -69,23 +73,23 @@
               <template v-if="currentUserQueueItem">
                 <v-sheet
                   :color="currentUserQueueItem.isNext ? 'green-lighten-5' : 'blue-grey-lighten-5'"
-                  class="pa-4 rounded-lg d-flex align-center justify-space-between mb-4 elevation-2"
+                  class="pa-4 rounded-xl d-flex flex-column flex-sm-row align-center justify-space-between mb-6 elevation-4"
                 >
-                  <div>
-                    <div class="text-caption font-weight-medium text-medium-emphasis">
-                      A Sua Posição
+                  <div class="mb-2 mb-sm-0">
+                    <div class="text-caption font-weight-bold text-medium-emphasis mb-1">
+                      A Sua Posição Atual
                     </div>
                     <v-chip
                       :color="currentUserQueueItem.isNext ? 'green-darken-2' : 'blue-darken-2'"
                       label
-                      size="large"
+                      size="x-large"
                       class="font-weight-black text-uppercase"
                     >
-                      <v-icon start>
+                      <v-icon start size="28">
                         {{
                           currentUserQueueItem.isNext
                             ? "mdi-trophy-gold"
-                            : "mdi-numeric-" + currentUserQueueItem.position + "-circle"
+                            : "mdi-numeric-" + currentUserQueueItem.position + "-circle-outline"
                         }}
                       </v-icon>
                       {{
@@ -96,20 +100,20 @@
                     </v-chip>
                   </div>
                 </v-sheet>
-                
+
                 <v-card-text class="py-0">
-                  <div class="text-subtitle-1 font-weight-bold mb-3 text-brown-darken-3">
-                    Gerir Seus Pedidos na Fila:
+                  <div class="text-subtitle-1 font-weight-bold mb-4 text-brown-darken-3 d-flex align-center">
+                    <v-icon left size="20" class="mr-1">mdi-basket</v-icon> Gerir Seus Pedidos:
                   </div>
 
                   <v-row align="center" class="mb-3">
-                    <v-col cols="5" class="pa-1">
-                      <div class="font-weight-medium text-brown-darken-2 d-flex align-center">
-                        <v-icon color="brown-darken-2" class="mr-1">mdi-coffee-outline</v-icon> Café:
+                    <v-col cols="12" sm="5" class="py-1">
+                      <div class="font-weight-bold text-brown-darken-2 d-flex align-center text-subtitle-1">
+                        <v-icon color="brown-darken-2" class="mr-2" size="24">mdi-coffee-outline</v-icon> Café:
                       </div>
                     </v-col>
-                    <v-col cols="7" class="pa-1">
-                      <div class="d-flex align-center">
+                    <v-col cols="12" sm="7" class="py-1">
+                      <div class="d-flex align-center justify-end">
                         <v-btn
                           icon="mdi-minus"
                           size="small"
@@ -121,9 +125,9 @@
                           class="mr-2"
                         />
                         <v-chip
-                          size="large"
+                          size="x-large"
                           color="brown-darken-1"
-                          class="font-weight-bold"
+                          class="font-weight-black text-white"
                         >
                           {{ currentUserQueueItem.cafe }}
                         </v-chip>
@@ -142,13 +146,13 @@
                   </v-row>
 
                   <v-row align="center" class="mb-4">
-                    <v-col cols="5" class="pa-1">
-                      <div class="font-weight-medium text-brown-darken-2 d-flex align-center">
-                        <v-icon color="light-blue-darken-3" class="mr-1">mdi-filter</v-icon> Filtro:
+                    <v-col cols="12" sm="5" class="py-1">
+                      <div class="font-weight-bold text-brown-darken-2 d-flex align-center text-subtitle-1">
+                        <v-icon color="light-blue-darken-3" class="mr-2" size="24">mdi-filter</v-icon> Filtro:
                       </div>
                     </v-col>
-                    <v-col cols="7" class="pa-1">
-                      <div class="d-flex align-center">
+                    <v-col cols="12" sm="7" class="py-1">
+                      <div class="d-flex align-center justify-end">
                         <v-btn
                           icon="mdi-minus"
                           size="small"
@@ -160,9 +164,9 @@
                           class="mr-2"
                         />
                         <v-chip
-                          size="large"
+                          size="x-large"
                           color="light-blue-darken-3"
-                          class="font-weight-bold"
+                          class="font-weight-black text-white"
                         >
                           {{ currentUserQueueItem.filtro }}
                         </v-chip>
@@ -184,15 +188,15 @@
                 <v-divider class="my-4"></v-divider>
 
                 <v-btn
-                  color="red-lighten-1"
+                  color="red-darken-1"
                   variant="flat"
                   :loading="loadingSair"
                   @click="removerDaFila(currentUserQueueItem)"
                   block
-                  class="mt-2 font-weight-bold elevation-2"
-                  size="large"
+                  class="mt-4 font-weight-black elevation-4 rounded-xl"
+                  size="x-large"
                 >
-                  <v-icon left>mdi-close-circle-outline</v-icon> Sair da Fila
+                  <v-icon start>mdi-close-circle</v-icon> Sair da Fila
                 </v-btn>
               </template>
 
@@ -201,47 +205,48 @@
                   type="info"
                   variant="tonal"
                   density="comfortable"
-                  class="mb-3 rounded-lg"
+                  class="mb-6 rounded-lg elevation-2"
                   color="blue-grey"
+                  icon="mdi-information-outline"
                 >
                   Não está na fila. Adicione um item para entrar!
                 </v-alert>
-                
+
                 <v-divider class="my-4"></v-divider>
-                
+
                 <v-card-text class="py-0">
-                  <div class="text-subtitle-1 font-weight-bold mb-3 text-brown-darken-3">
-                    Entrar na Fila:
+                  <div class="text-subtitle-1 font-weight-bold mb-3 text-brown-darken-3 d-flex align-center">
+                     <v-icon left size="20" class="mr-1">mdi-plus-box</v-icon> Entrar na Fila:
                   </div>
-                  <v-row>
-                    <v-col cols="6" class="pa-1">
+                  <v-row class="mt-4">
+                    <v-col cols="12" sm="6" class="pa-2">
                       <v-btn
                         block
                         color="brown-darken-1"
                         @click="alterarQuantidade('cafe', 1)"
                         :disabled="loadingItemUpdate.cafe || !currentUser"
                         :loading="loadingItemUpdate.cafe === 1"
-                        prepend-icon="mdi-coffee-maker"
+                        prepend-icon="mdi-coffee-maker-outline"
                         size="large"
                         variant="flat"
-                        class="elevation-2"
+                        class="elevation-4 font-weight-black rounded-lg"
                       >
-                        Adicionar Café
+                        Café
                       </v-btn>
                     </v-col>
-                    <v-col cols="6" class="pa-1">
+                    <v-col cols="12" sm="6" class="pa-2">
                       <v-btn
                         block
                         color="light-blue-darken-3"
                         @click="alterarQuantidade('filtro', 1)"
                         :disabled="loadingItemUpdate.filtro || !currentUser"
                         :loading="loadingItemUpdate.filtro === 1"
-                        prepend-icon="mdi-filter-cog"
+                        prepend-icon="mdi-filter-cog-outline"
                         size="large"
                         variant="flat"
-                        class="elevation-2"
+                        class="elevation-4 font-weight-black rounded-lg"
                       >
-                        Adicionar Filtro
+                        Filtro
                       </v-btn>
                     </v-col>
                   </v-row>
@@ -252,33 +257,36 @@
 
           <v-col cols="12" md="6" v-if="proximoComprador">
             <v-card
-              color="brown-lighten-5"
-              class="pa-6 h-100 elevation-6 card-next-queue border-lg border-amber-darken-2"
+              color="amber-lighten-5"
+              class="pa-6 h-100 elevation-10 border-lg border-amber-darken-2"
               rounded="xl"
             >
-              <v-card-title class="text-h5 text-center text-brown-darken-4 font-weight-black mb-1">
-                <v-icon left size="32" color="amber-darken-3" class="bounce">mdi-fire</v-icon> AGORA É A VEZ DE:
+              <v-card-title class="text-h4 text-center text-brown-darken-4 font-weight-black mb-2">
+                <v-icon size="36" color="amber-darken-3" class="bounce mr-2">mdi-fire</v-icon> PRÓXIMO:
               </v-card-title>
 
-              <v-divider class="mb-4 mt-2"></v-divider>
+              <v-divider class="mb-6 mt-2"></v-divider>
 
-              <v-card-text>
-                <div
-                  class="text-h4 font-weight-black mb-4 text-center text-brown-darken-2 text-capitalize"
+              <v-card-text class="text-center">
+                <v-chip
+                  color="brown-darken-2"
+                  size="x-large"
+                  class="text-h5 font-weight-black mb-4 text-white text-capitalize elevation-2 px-6 py-4"
                 >
                   {{ proximoComprador.usuario.email.split("@")[0] }}
-                </div>
-                <v-sheet class="pa-4 rounded-lg bg-brown-lighten-4 elevation-1">
-                  <div class="text-subtitle-1 font-weight-bold text-brown-darken-3 mb-1">
-                    🛒 Itens Necessários:
+                </v-chip>
+
+                <v-sheet class="pa-4 rounded-xl bg-brown-lighten-4 elevation-3 mt-4">
+                  <div class="text-subtitle-1 font-weight-bold text-brown-darken-3 mb-2 d-flex align-center justify-center">
+                    <v-icon left size="24" class="mr-1">mdi-shopping-outline</v-icon> Itens a Comprar:
                   </div>
-                  <p class="text-body-1 font-weight-medium text-brown-darken-2">
+                  <p class="text-body-1 font-weight-black text-brown-darken-2">
                     {{ formatarPedidos(proximoComprador) }}
                   </p>
                 </v-sheet>
               </v-card-text>
 
-              <v-card-actions class="px-3 pt-4">
+              <v-card-actions class="px-3 pt-6">
                 <v-btn
                   block
                   color="green-darken-1"
@@ -286,17 +294,18 @@
                   :loading="loadingConcluir"
                   :disabled="!isCurrentUserAdmin || loading"
                   @click="concluirCompra"
-                  class="font-weight-black elevation-3"
+                  class="font-weight-black elevation-5 rounded-xl"
+                  prepend-icon="mdi-coffee-check"
                 >
-                  <v-icon left>mdi-coffee-check</v-icon> CONFIRMAR COMPRA
+                  CONFIRMAR COMPRA
                 </v-btn>
               </v-card-actions>
 
               <v-card-subtitle
                 v-if="!isCurrentUserAdmin"
-                class="text-red-darken-2 text-center mt-3 font-weight-medium"
+                class="text-red-darken-2 text-center mt-3 font-weight-medium text-caption"
               >
-                Ação de administrador.
+                Ação reservada para administradores.
               </v-card-subtitle>
             </v-card>
           </v-col>
@@ -304,13 +313,13 @@
 
         <v-row v-if="!loading && filaCompradores.length === 0">
           <v-col cols="12">
-            <v-card class="pa-6 text-center elevation-3" color="green-lighten-5" rounded="xl">
-              <v-icon size="40" color="green-darken-2">mdi-cup-water</v-icon>
-              <p class="text-h6 mt-3 font-weight-medium text-green-darken-2">
-                Missão cumprida! A fila está vazia.
+            <v-card class="pa-8 text-center elevation-6" color="green-lighten-5" rounded="xl">
+              <v-icon size="60" color="green-darken-2">mdi-cup-water</v-icon>
+              <p class="text-h5 mt-4 font-weight-black text-green-darken-2">
+                ✨ Fila Vazia! Missão Cumprida. ✨
               </p>
-              <p class="text-body-2 text-medium-emphasis mt-1">
-                Ninguém precisa comprar neste momento. Que alívio!
+              <p class="text-body-1 text-medium-emphasis mt-2">
+                Ninguém precisa comprar neste momento. Aproveite o seu café!
               </p>
             </v-card>
           </v-col>
@@ -318,205 +327,232 @@
 
         <v-row v-else-if="filaCompradoresFiltrada.length > 0 || (filtroAtivo && filaCompradoresFiltrada.length === 0)">
           <v-col cols="12">
-            <v-card elevation="4" class="pa-4" rounded="xl">
+            <v-card elevation="8" class="pa-6" rounded="xl">
               <v-card-title
-                class="text-h6 text-orange-darken-3 font-weight-bold d-flex align-center"
+                class="text-h5 text-orange-darken-3 font-weight-black d-flex align-center pb-2"
               >
-                <v-icon left class="mr-2">mdi-account-group</v-icon>
-                Próximos Compradores (Total: {{ restanteDaFilaFiltrada.length }})
+                <v-icon size="32" class="mr-3">mdi-account-group</v-icon>
+                Restante da Fila (Total: {{ restanteDaFilaFiltrada.length }})
               </v-card-title>
 
+              <v-divider class="mt-1 mb-4"></v-divider>
+
               <v-card-text class="pt-0 pb-2">
-                <v-row align="center" class="mb-3">
-                  <v-col cols="12" md="4">
+                <v-row align="center" class="mb-4">
+                  <v-col cols="12" md="4" class="py-1">
                     <v-select
                       v-model="filtroFila.item"
                       :items="itemOptions"
-                      label="Item"
+                      label="Filtrar Item"
                       clearable
-                      prepend-icon="mdi-coffee"
+                      prepend-icon="mdi-filter-variant"
                       variant="outlined"
-                      density="compact"
+                      density="comfortable"
                       hide-details
+                      color="brown-darken-2"
                     />
                   </v-col>
 
-                  <v-col cols="12" md="4">
-    <v-select
-        v-model="filtroFila.usuarioId"
-        :items="listaUsuarios"
-        :item-title="(item) => item.email.split('@')[0]" 
-        item-value="id"
-        label="Usuário"
-        clearable
-        prepend-icon="mdi-account-search"
-        variant="outlined"
-        density="compact"
-        hide-details
-    />
-</v-col>
+                  <v-col cols="12" md="4" class="py-1">
+                    <v-select
+                      v-model="filtroFila.usuarioId"
+                      :items="listaUsuarios"
+                      :item-title="(item) => item.email.split('@')[0]"
+                      item-value="id"
+                      label="Filtrar Usuário"
+                      clearable
+                      prepend-icon="mdi-account-search"
+                      variant="outlined"
+                      density="comfortable"
+                      hide-details
+                      color="brown-darken-2"
+                    />
+                  </v-col>
 
-                  <v-col cols="12" md="4" class="d-flex align-center">
+                  <v-col cols="12" md="4" class="py-1 d-flex align-center">
                     <v-text-field
                       v-model="filtroFila.dataInicio"
-                      label="Data Mínima (Opcional)"
+                      label="Data Mínima (DD/MM/AAAA)"
                       placeholder="DD/MM/AAAA"
                       prepend-icon="mdi-calendar-start"
                       variant="outlined"
-                      density="compact"
+                      density="comfortable"
                       hide-details
                       maxlength="10"
                       @input="formatarInputData($event, 'dataInicio')"
                       class="mr-2"
+                      color="brown-darken-2"
                     />
-                    <v-btn color="grey-darken-1" @click="limparFiltrosFila" variant="outlined" class="flex-grow-0">
-                      Limpar
-                    </v-btn>
+                    <v-btn color="grey-darken-1" @click="limparFiltrosFila" variant="outlined" class="flex-grow-0" size="large" icon="mdi-close-circle-outline"></v-btn>
                   </v-col>
                 </v-row>
               </v-card-text>
 
               <v-divider class="mx-4"></v-divider>
 
-              <v-list density="default" class="bg-transparent">
+              <v-list density="default" class="bg-transparent pa-2">
                 <template v-if="restanteDaFilaFiltrada.length > 0">
                   <v-list-item
                     v-for="(p, index) in restanteDaFilaFiltrada"
                     :key="p.usuario_id"
-                    class="my-3 pa-3 rounded-lg list-item-hover transition-swing"
+                    class="my-3 pa-4 rounded-xl list-item-hover transition-swing elevation-1"
                     :class="{
-                      'bg-blue-grey-lighten-5 elevation-1': p.usuario_id === currentUser?.id,
-                      'border-b': p.usuario_id !== currentUser?.id,
+                      'bg-blue-grey-lighten-5 border-s-lg border-blue-darken-1': p.usuario_id === currentUser?.id,
+                      'bg-white border-b-sm': p.usuario_id !== currentUser?.id,
                     }"
                   >
                     <template v-slot:prepend>
                       <v-avatar
                         color="amber-darken-3"
-                        size="48"
-                        class="font-weight-black white--text elevation-1"
+                        size="54"
+                        class="font-weight-black white--text elevation-2"
                       >
                         {{ filtroAtivo ? index + 1 : index + 2 }}
                       </v-avatar>
                     </template>
-                    <v-list-item-title class="font-weight-bold text-brown-darken-3 text-capitalize">
+
+                    <v-list-item-title class="font-weight-bold text-brown-darken-3 text-subtitle-1 text-capitalize">
                       {{ p.usuario.email.split("@")[0] }}
                       <v-chip
                         v-if="p.usuario_id === currentUser?.id"
                         color="blue"
                         size="small"
-                        class="ml-2 font-weight-medium"
+                        class="ml-2 font-weight-black text-uppercase"
+                        label
                       >
                         VOCÊ
                       </v-chip>
                     </v-list-item-title>
-                    <v-list-item-subtitle class="mt-1 text-body-2 font-weight-medium">
-                      Itens:
-                      <span class="text-brown-darken-1 font-weight-bold">{{ formatarPedidos(p) }}</span>
+
+                    <v-list-item-subtitle class="mt-2 text-body-2 font-weight-medium">
+                      Pedidos:
+                      <v-chip-group class="mt-1">
+                        <v-chip
+                          v-if="p.cafe > 0"
+                          size="small"
+                          color="brown-darken-1"
+                          prepend-icon="mdi-coffee"
+                          class="font-weight-bold"
+                        >
+                          {{ p.cafe }} Café
+                        </v-chip>
+                        <v-chip
+                          v-if="p.filtro > 0"
+                          size="small"
+                          color="light-blue-darken-3"
+                          prepend-icon="mdi-filter"
+                          class="font-weight-bold"
+                        >
+                          {{ p.filtro }} Filtro
+                        </v-chip>
+                      </v-chip-group>
                     </v-list-item-subtitle>
 
                     <template v-slot:append>
-                      <v-btn
-                        icon="mdi-arrow-up-circle-outline"
-                        size="small"
-                        variant="text"
-                        color="blue"
-                        title="Mover para a 2ª Posição"
-                        :loading="loadingMover"
-                        :disabled="!isCurrentUserAdmin || loading"
-                        @click="moverParaProximo(p.usuario_id)"
-                        class="mr-2"
-                      />
-                      <v-btn
-                        icon="mdi-trash-can-outline"
-                        size="small"
-                        variant="text"
-                        color="red"
-                        title="Remover da fila"
-                        :loading="loading"
-                        :disabled="!isCurrentUserAdmin || loading"
-                        @click="removerDaFila(p)"
-                      />
+                      <div class="d-flex align-center">
+                        <v-btn
+                          icon="mdi-arrow-up-circle"
+                          size="large"
+                          variant="text"
+                          color="blue-darken-1"
+                          title="Mover para 2ª Posição"
+                          :loading="loadingMover"
+                          :disabled="!isCurrentUserAdmin || loading"
+                          @click="moverParaProximo(p.usuario_id)"
+                          class="mr-2"
+                        />
+                        <v-btn
+                          icon="mdi-trash-can"
+                          size="large"
+                          variant="text"
+                          color="red-darken-1"
+                          title="Remover da fila"
+                          :loading="loading"
+                          :disabled="!isCurrentUserAdmin || loading"
+                          @click="removerDaFila(p)"
+                        />
+                      </div>
                     </template>
                   </v-list-item>
                 </template>
-                <v-card v-else variant="outlined" class="text-center pa-4 text-grey-darken-1 my-3">
-                  <v-icon size="30" class="mb-2">mdi-magnify-remove-outline</v-icon>
-                  <p class="font-weight-medium">Nenhum resultado encontrado para os filtros.</p>
+                <v-card v-else variant="outlined" class="text-center pa-4 text-grey-darken-1 my-3 rounded-lg">
+                  <v-icon size="36" class="mb-2">mdi-magnify-remove-outline</v-icon>
+                  <p class="font-weight-medium text-subtitle-1">Nenhum resultado encontrado para os filtros.</p>
                 </v-card>
               </v-list>
 
               <v-card-subtitle
                 v-if="!isCurrentUserAdmin"
-                class="text-red-darken-2 text-right mt-2 font-italic"
+                class="text-red-darken-2 text-right mt-2 font-italic text-caption"
               >
-                Apenas administradores podem gerir a ordem da fila.
+                Ações de gestão de fila reservadas para administradores.
               </v-card-subtitle>
             </v-card>
           </v-col>
         </v-row>
 
         <v-row v-if="!loading" class="mt-8">
-          
-          <v-col  cols="12" md="4">
-            <v-card class="pa-5 elevation-6" rounded="xl" color="blue-grey-lighten-5">
-              <v-card-title class="text-h6 font-weight-bold text-blue-grey-darken-3">
-                <v-icon left class="mr-2">mdi-history</v-icon>
+          <v-col cols="12" md="4">
+            <v-card class="pa-6 elevation-8" rounded="xl" color="blue-grey-lighten-5">
+              <v-card-title class="text-h6 font-weight-black text-blue-grey-darken-3 pb-2">
+                <v-icon size="28" class="mr-2">mdi-history</v-icon>
                 Sua Última Compra
               </v-card-title>
 
               <v-divider class="my-3"></v-divider>
 
               <template v-if="ultimaCompra">
-                <div class="text-body-1 text-blue-grey-darken-3 mb-2">
-                  <strong class="font-weight-black">Data:</strong> {{ formatarData(ultimaCompra.data) }}
+                <div class="text-body-1 text-blue-grey-darken-3 mb-3">
+                  <strong class="font-weight-bold">📅 Data:</strong> {{ formatarData(ultimaCompra.data) }}
                 </div>
-                <div class="text-body-1 text-blue-grey-darken-3 mb-2">
-                  <strong class="font-weight-black">Itens:</strong> {{ ultimaCompra.descricao }}
+                <div class="text-body-1 text-blue-grey-darken-3 mb-3">
+                  <strong class="font-weight-bold">☕ Itens:</strong> 
+                  <v-chip size="small" color="blue-grey-darken-2" class="ml-1 font-weight-bold">{{ ultimaCompra.descricao }}</v-chip>
                 </div>
                 <div class="text-body-1 text-blue-grey-darken-3">
-                  <strong class="font-weight-black">Total:</strong> 
-                  <v-chip size="small" color="blue-grey-darken-2" class="ml-1 font-weight-bold">
+                  <strong class="font-weight-bold">💲 Total:</strong>
+                  <v-chip size="small" color="brown-darken-1" class="ml-1 font-weight-black">
                     {{ ultimaCompra.total }} unid.
                   </v-chip>
                 </div>
               </template>
 
               <template v-else>
-                <v-alert type="info" variant="tonal" color="blue-grey">
+                <v-alert type="info" variant="tonal" color="blue-grey" icon="mdi-cup-off-outline" class="rounded-lg">
                   Ainda não realizou compras.
                 </v-alert>
               </template>
             </v-card>
           </v-col>
 
-          
           <v-col cols="12" md="8">
-            <v-card class="pa-5 elevation-6" rounded="xl">
-              <v-card-title class="text-h6 font-weight-bold text-brown-darken-3 d-flex align-center">
-                <v-icon left class="mr-2">mdi-cart-outline</v-icon>
+            <v-card class="pa-6 elevation-8" rounded="xl">
+              <v-card-title class="text-h6 font-weight-black text-brown-darken-3 d-flex align-center pb-2">
+                <v-icon size="28" class="mr-2">mdi-cart-outline</v-icon>
                 Histórico de Compras ({{ listaComprasFiltrada.length }})
               </v-card-title>
 
               <v-divider class="my-3"></v-divider>
 
               <v-card-text class="pt-0 pb-2">
-                <v-row align="center" class="mb-3">
-                  <v-col cols="12" md="4" sm="6">
-    <v-select
-        v-model="filtroCompras.usuarioId"
-        :items="listaUsuarios"
-        :item-title="(item) => item.email.split('@')[0]"  
-        item-value="id"
-        label="Filtrar por Usuário"
-        clearable
-        prepend-icon="mdi-account-circle"
-        variant="outlined"
-        density="compact"
-        hide-details
-    />
-</v-col>
+                <v-row align="center" class="mb-4">
+                  <v-col cols="12" md="4" sm="6" class="py-1">
+                    <v-select
+                      v-model="filtroCompras.usuarioId"
+                      :items="listaUsuarios"
+                      :item-title="(item) => item.email.split('@')[0]"
+                      item-value="id"
+                      label="Filtrar por Usuário"
+                      clearable
+                      prepend-icon="mdi-account-circle"
+                      variant="outlined"
+                      density="comfortable"
+                      hide-details
+                      color="brown-darken-2"
+                    />
+                  </v-col>
 
-                  <v-col cols="12" md="3" sm="6">
+                  <v-col cols="12" md="3" sm="6" class="py-1">
                     <v-select
                       v-model="filtroCompras.item"
                       :items="['Café', 'Filtro']"
@@ -524,58 +560,61 @@
                       clearable
                       prepend-icon="mdi-tag-outline"
                       variant="outlined"
-                      density="compact"
+                      density="comfortable"
                       hide-details
+                      color="brown-darken-2"
                     />
                   </v-col>
 
-                  <v-col cols="12" md="3" sm="6">
+                  <v-col cols="12" md="3" sm="6" class="py-1">
                     <v-text-field
                       v-model="filtroCompras.data"
-                      label="Filtrar por Data"
+                      label="Filtrar por Data (DD/MM/AAAA)"
                       placeholder="DD/MM/AAAA"
                       prepend-icon="mdi-calendar-range"
                       variant="outlined"
-                      density="compact"
+                      density="comfortable"
                       hide-details
                       maxlength="10"
                       @input="formatarInputData($event, 'data', 'filtroCompras')"
+                      color="brown-darken-2"
                     />
                   </v-col>
 
-                  <v-col cols="12" md="2" sm="6" class="d-flex align-center">
-                    <v-btn color="grey-darken-1" @click="limparFiltrosCompras" variant="outlined" class="flex-grow-1">
+                  <v-col cols="12" md="2" sm="6" class="py-1 d-flex align-center">
+                    <v-btn color="grey-darken-1" @click="limparFiltrosCompras" variant="outlined" class="flex-grow-1" size="large">
                       Limpar
                     </v-btn>
                   </v-col>
                 </v-row>
               </v-card-text>
+
               <v-divider class="mx-4"></v-divider>
-              
+
               <v-data-table
                 :headers="headersCompras"
                 :items="listaComprasFiltrada"
                 item-key="id"
                 density="comfortable"
-                class="elevation-0"
+                class="elevation-0 mt-2"
                 no-data-text="Nenhuma compra encontrada ou correspondente aos filtros"
               >
                 <template #item.usuario.email="{ item }">
-                  <span class="font-weight-medium text-capitalize">
+                  <span class="font-weight-black text-capitalize text-brown-darken-3">
                     {{ item.usuario.email.split("@")[0] }}
                   </span>
                 </template>
-                
+
                 <template #item.data="{ item }">
-                  {{ formatarData(item.data) }}
+                  <v-chip size="small" variant="tonal" color="blue-grey-darken-1">{{ formatarData(item.data) }}</v-chip>
                 </template>
 
                 <template #item.descricao="{ item }">
-                  <v-chip size="small" color="blue-grey-darken-1" label>{{ item.descricao }}</v-chip>
+                  <v-chip size="small" color="blue-grey-darken-1" label class="font-weight-medium">{{ item.descricao }}</v-chip>
                 </template>
 
                 <template #item.total="{ item }">
-                  <span class="font-weight-bold text-brown-darken-2">{{ item.total }}</span>
+                  <span class="font-weight-black text-brown-darken-2 text-h6">{{ item.total }}</span>
                 </template>
 
               </v-data-table>
@@ -586,31 +625,36 @@
     </v-main>
 
     <v-dialog v-model="showInfoDialog" max-width="600">
-      <v-card rounded="xl">
+      <v-card rounded="xl" class="elevation-12">
         <v-card-title
-          class="text-h5 font-weight-bold bg-brown-darken-4 text-white d-flex justify-space-between"
+          class="text-h5 font-weight-black bg-brown-darken-4 text-amber-lighten-3 d-flex justify-space-between align-center py-3"
         >
+          <v-icon class="mr-2" size="30">mdi-information</v-icon>
           Informações Atuais de Compra
-          <v-btn icon="mdi-close" variant="text" color="white" @click="showInfoDialog = false" />
+          <v-btn icon="mdi-close" variant="text" color="amber-lighten-3" @click="showInfoDialog = false" />
         </v-card-title>
-        <v-card-text class="pt-4">
+        <v-card-text class="pt-4 pb-2">
           <div v-html="coffeeInfoText" class="text-body-1 text-medium-emphasis" />
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="pt-0 pb-3">
           <v-spacer />
-          <v-btn color="red-darken-1" variant="text" @click="showInfoDialog = false">Fechar</v-btn>
+          <v-btn color="red-darken-1" variant="flat" @click="showInfoDialog = false" class="font-weight-bold rounded-lg">Fechar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
     <v-dialog v-model="visible" max-width="400">
-      <v-card>
-        <v-card-title class="text-h6">Deseja realmente sair?</v-card-title>
-        <v-card-text>Você será desconectado do sistema.</v-card-text>
-        <v-card-actions>
+      <v-card rounded="xl">
+        <v-card-title class="text-h6 font-weight-bold bg-red-darken-1 text-white">
+          <v-icon class="mr-2" size="24">mdi-alert-circle-outline</v-icon> Confirmação de Saída
+        </v-card-title>
+        <v-card-text class="pt-4 pb-2 text-body-1">
+          Deseja realmente sair? Você será desconectado do sistema.
+        </v-card-text>
+        <v-card-actions class="pa-4 pt-2">
           <v-spacer />
-          <v-btn text @click="cancelar" :disabled="carregando">Cancelar</v-btn>
-          <v-btn color="red" @click="handleLogout" :loading="carregando">Sair</v-btn>
+          <v-btn variant="outlined" @click="cancelar" :disabled="carregando" class="font-weight-bold">Cancelar</v-btn>
+          <v-btn color="red" @click="handleLogout" :loading="carregando" variant="flat" class="font-weight-bold">Sair</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
