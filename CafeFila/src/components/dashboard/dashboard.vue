@@ -382,95 +382,104 @@
               <v-divider class="mx-4"></v-divider>
 
               <v-list density="default" class="bg-transparent pa-2">
-                <template v-if="restanteDaFilaFiltrada.length > 0">
-                  <v-list-item
-                    v-for="(p, index) in restanteDaFilaFiltrada"
-                    :key="p.usuario_id"
-                    class="my-3 pa-4 rounded-xl list-item-hover transition-swing elevation-1"
-                    :class="{
-                      'bg-blue-grey-lighten-5 border-s-lg border-blue-darken-1': p.usuario_id === currentUser?.id,
-                      'bg-white border-b-sm': p.usuario_id !== currentUser?.id,
-                    }"
-                  >
-                    <template v-slot:prepend>
-                      <v-avatar
-                        color="amber-darken-3"
-                        size="54"
-                        class="font-weight-black white--text elevation-2"
-                      >
-                        {{ filtroAtivo ? index + 1 : index + 2 }}
-                      </v-avatar>
-                    </template>
+    <template v-if="restanteDaFilaFiltrada.length > 0">
+        <v-list-item
+            v-for="(p, index) in restanteDaFilaFiltrada"
+            :key="p.usuario_id"
+            class="my-3 pa-4 rounded-xl list-item-hover transition-swing elevation-1"
+            :class="{
+                'bg-blue-grey-lighten-5 border-s-lg border-blue-darken-1': p.usuario_id === currentUser?.id,
+                'bg-white border-b-sm': p.usuario_id !== currentUser?.id,
+            }"
+        >
+            <template v-slot:prepend>
+                <v-avatar
+                    color="amber-darken-3"
+                    size="54"
+                    class="font-weight-black white--text elevation-2"
+                >
+                    {{ filtroAtivo ? index + 1 : index + 2 }}
+                </v-avatar>
+            </template>
 
-                    <v-list-item-title class="font-weight-bold text-brown-darken-3 text-subtitle-1 text-capitalize">
-                      {{ p.usuario.email.split("@")[0] }}
-                      <v-chip
-                        v-if="p.usuario_id === currentUser?.id"
-                        color="blue"
+            <v-list-item-title class="font-weight-bold text-brown-darken-3 text-subtitle-1 text-capitalize">
+                {{ p.usuario.email.split("@")[0] }}
+                <v-chip
+                    v-if="p.usuario_id === currentUser?.id"
+                    color="blue"
+                    size="small"
+                    class="ml-2 font-weight-black text-uppercase"
+                    label
+                >
+                    VOCÊ
+                </v-chip>
+            </v-list-item-title>
+
+            <v-list-item-subtitle class="mt-2 font-weight-medium">
+                Pedidos:
+            </v-list-item-subtitle>
+
+            <div class="d-flex align-center mt-1">
+                <v-chip-group>
+                    <v-chip
+                        v-if="p.cafe > 0"
                         size="small"
-                        class="ml-2 font-weight-black text-uppercase"
-                        label
-                      >
-                        VOCÊ
-                      </v-chip>
-                    </v-list-item-title>
+                        color="brown-darken-1"
+                        prepend-icon="mdi-coffee"
+                        class="font-weight-bold"
+                    >
+                        {{ p.cafe }} Café
+                    </v-chip>
+                    <v-chip
+                        v-if="p.filtro > 0"
+                        size="small"
+                        color="light-blue-darken-3"
+                        prepend-icon="mdi-filter"
+                        class="font-weight-bold"
+                    >
+                        {{ p.filtro }} Filtro
+                    </v-chip>
+                </v-chip-group>
+            </div>
+            <template v-slot:append>
+                <div class="d-flex align-center">
+                    <v-btn
+                        icon="mdi-arrow-up-circle"
+                        size="large"
+                        variant="text"
+                        color="blue-darken-1"
+                        title="Mover para 2ª Posição"
+                        :loading="loadingMover"
+                        :disabled="!isCurrentUserAdmin || loading"
+                        @click="moverParaProximo(p.usuario_id)"
+                        class="mr-2"
+                    />
+                    <v-btn
+                        icon="mdi-trash-can"
+                        size="large"
+                        variant="text"
+                        color="red-darken-1"
+                        title="Remover da fila"
+                        :loading="loading"
+                        :disabled="!isCurrentUserAdmin || loading"
+                        @click="removerDaFila(p)"
+                    />
+                </div>
+            </template>
+        </v-list-item>
+    </template>
+    <v-card v-else variant="outlined" class="text-center pa-4 text-grey-darken-1 my-3 rounded-lg">
+        <v-icon size="36" class="mb-2">mdi-magnify-remove-outline</v-icon>
+        <p class="font-weight-medium text-subtitle-1">Nenhum resultado encontrado para os filtros.</p>
+    </v-card>
+</v-list>
 
-                    <v-list-item-subtitle class="mt-2 text-body-2 font-weight-medium">
-                      Pedidos:
-                      <v-chip-group class="mt-1">
-                        <v-chip
-                          v-if="p.cafe > 0"
-                          size="small"
-                          color="brown-darken-1"
-                          prepend-icon="mdi-coffee"
-                          class="font-weight-bold"
-                        >
-                          {{ p.cafe }} Café
-                        </v-chip>
-                        <v-chip
-                          v-if="p.filtro > 0"
-                          size="small"
-                          color="light-blue-darken-3"
-                          prepend-icon="mdi-filter"
-                          class="font-weight-bold"
-                        >
-                          {{ p.filtro }} Filtro
-                        </v-chip>
-                      </v-chip-group>
-                    </v-list-item-subtitle>
-
-                    <template v-slot:append>
-                      <div class="d-flex align-center">
-                        <v-btn
-                          icon="mdi-arrow-up-circle"
-                          size="large"
-                          variant="text"
-                          color="blue-darken-1"
-                          title="Mover para 2ª Posição"
-                          :loading="loadingMover"
-                          :disabled="!isCurrentUserAdmin || loading"
-                          @click="moverParaProximo(p.usuario_id)"
-                          class="mr-2"
-                        />
-                        <v-btn
-                          icon="mdi-trash-can"
-                          size="large"
-                          variant="text"
-                          color="red-darken-1"
-                          title="Remover da fila"
-                          :loading="loading"
-                          :disabled="!isCurrentUserAdmin || loading"
-                          @click="removerDaFila(p)"
-                        />
-                      </div>
-                    </template>
-                  </v-list-item>
-                </template>
-                <v-card v-else variant="outlined" class="text-center pa-4 text-grey-darken-1 my-3 rounded-lg">
-                  <v-icon size="36" class="mb-2">mdi-magnify-remove-outline</v-icon>
-                  <p class="font-weight-medium text-subtitle-1">Nenhum resultado encontrado para os filtros.</p>
-                </v-card>
-              </v-list>
+<v-card-subtitle
+    v-if="!isCurrentUserAdmin"
+    class="text-red-darken-2 text-right mt-2 font-italic text-caption"
+>
+    Ações de gestão de fila reservadas para administradores.
+</v-card-subtitle>
 
               <v-card-subtitle
                 v-if="!isCurrentUserAdmin"
