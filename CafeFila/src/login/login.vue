@@ -1,21 +1,30 @@
 <template>
-  <v-container fluid class="fill-height" style="background-color: #f5f5f5;">
-    <v-row justify="center" align="center">
-      <v-col cols="12" sm="8" md="4">
-        <v-card class="elevation-12 pa-4" border>
+  <v-container fluid class="fill-height app-bg-coffee">
+    <div class="overlay-gradient"></div>
+
+    <v-row justify="center" align="center" class="w-100">
+      <v-col cols="12" sm="10" md="6" lg="4">
+        <v-card 
+          class="pa-6 elevation-15 rounded-xl card-shadow-coffee" 
+          color="white"
+          border
+        >
           
-          <v-card-title class="text-h5 text-center mb-4 text-brown-darken-3">
-            ☕ Acesso ao Dashboard
+          <v-card-title class="text-h4 font-weight-black text-center mb-6 text-brown-darken-3">
+            <v-icon size="36" color="amber-darken-2" class="mr-2">mdi-coffee</v-icon>
+            Login
           </v-card-title>
           
           <v-card-text>
             <v-alert
               v-if="errorMessage"
               type="error"
-              variant="tonal"
+              variant="flat"
               closable
-              density="compact"
-              class="mb-4"
+              class="mb-4 elevation-2 rounded-lg"
+              border="start"
+              border-color="red-darken-2"
+              icon="mdi-alert-circle-outline"
               @click:close="errorMessage = null"
             >
               {{ errorMessage }}
@@ -32,7 +41,8 @@
                 color="brown-darken-1"
                 :rules="[rules.required, rules.email]"
                 required
-                class="mb-3"
+                class="mb-4"
+                density="comfortable"
               ></v-text-field>
 
               <v-text-field
@@ -47,8 +57,12 @@
                 color="brown-darken-1"
                 :rules="[rules.required]"
                 required
-                class="mb-3"
+                class="mb-2"
+                density="comfortable"
               ></v-text-field>
+
+              
+
 
               <v-btn
                 color="brown-darken-1"
@@ -57,22 +71,24 @@
                 size="large"
                 :loading="loading"
                 :disabled="loading"
+                class="font-weight-bold elevation-5 rounded-pill"
+                prepend-icon="mdi-login"
               >
                 Entrar
               </v-btn>
             </v-form>
           </v-card-text>
           
-          <v-divider class="my-3"></v-divider>
+          <v-divider class="my-4"></v-divider>
           
           <v-card-actions class="justify-center">
             <router-link to="/cadastro" class="text-decoration-none">
-              <v-btn variant="text" color="blue-darken-1">
+              <v-btn variant="text" color="blue-grey-darken-1" class="font-weight-medium">
+                <v-icon start>mdi-account-plus-outline</v-icon>
                 Ainda não tem conta? Cadastre-se
               </v-btn>
             </router-link>
           </v-card-actions>
-
         </v-card>
       </v-col>
     </v-row>
