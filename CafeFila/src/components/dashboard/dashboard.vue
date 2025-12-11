@@ -444,7 +444,7 @@
             
             <v-list-item-subtitle class="mt-1 text-caption text-grey-darken-1">
                  <v-icon size="small" class="mr-1">mdi-clock-time-four-outline</v-icon>
-                 Desde: {{ formatarData(p.created_at) }}
+                 Desde: {{ formatarDataLocal(p.created_at) }}
             </v-list-item-subtitle>
 
             <template v-slot:append>
@@ -691,17 +691,18 @@ const formatarData = (isoDate) => {
     const date = new Date(isoDate);
 
     
+    if (isNaN(date.getTime())) return 'N/A'; 
+
+
     const options = {
         day: '2-digit',
         month: '2-digit',
-        year: '4-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        
+        year: 'numeric', 
     };
 
-   
-    return date.toLocaleString('pt-BR', options);
+  
+    return date.toLocaleDateString('pt-BR', options);
+    
 };
 
 const loadingItemUpdate = reactive({
@@ -828,7 +829,7 @@ const listaComprasFiltrada = computed(() => {
     if (!listaCompras.value) return [];
     
     return listaCompras.value.filter(compra => {
-        const { usuarioId, item, data } = filtroCompras.value; 
+        const { usuarioId, item, data } = filtroCompras;
         let pass = true;
 
         if (usuarioId !== null && compra.usuario_id !== usuarioId) {
@@ -842,17 +843,12 @@ const listaComprasFiltrada = computed(() => {
             }
         }
         
-        
         if (data && data.length === 10) {
-           
-            const compraDate = formatarData(compra.data); 
-            
-          
+            const compraDate = formatarData(compra.data).split(' ')[0]; 
             if (compraDate !== data) {
                 pass = false;
             }
         }
-       
 
         return pass;
     });
